@@ -1,6 +1,8 @@
 import React from "react";
 import { Noise } from "noisejs";
 import * as htmlToImage from 'html-to-image';
+import { TbReload } from "react-icons/tb";
+import './NoiseCanvas.css'
 
 
 function linearInterpolation(value:number, higherMultiplier:number, lowerMultiplier:number):number{
@@ -17,7 +19,7 @@ export default function NoiseCanvas():React.ReactElement{
   const [grayLevels, setGrayLevels] = React.useState<number>(4)
   const [stepsPerPixel, setStepsPerPixel] = React.useState<number>(2)
   const [scale, setScale] = React.useState<[number, number]>([40.0, 40.0])
-  const [seed, setSeed] = React.useState<number>(0)
+  const [seed, setSeed] = React.useState<number>(1)
   
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const noiseGen:Noise = React.useMemo<Noise>( ()=>{return new Noise(seed)}, [seed] ); // Criar gerador de noise
@@ -74,70 +76,94 @@ export default function NoiseCanvas():React.ReactElement{
   }
 
 
+  function handleChangeInputSeed(e:React.ChangeEvent<HTMLInputElement>):void{
+    const numberInput = Number(e.target.value);
+    if(isNaN(numberInput)) return;
+    else if(numberInput > 65535) return; // a lib so consegue lidar com valores entre 1 e 65536
+    else if(numberInput === 0) setSeed(1);
+    else setSeed(numberInput);
+  }
+
+
   return(
     <div className="noise-canvas">
-      <section className="settings-section">
-        <h2>Size</h2>
-        <div className="settings-section__container-sliders">
-          <div>
-            <p>Image size: {imageSize}px</p>
-            <input type="range" min={8} max={256} step={2} value={imageSize} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageSize(Number(e.target.value))}} />
+      
+      <div className="max-h-[30vh] overflow-y-scroll flex flex-col">
+        
+        <section className="settings-section">
+          <h2>Size</h2>
+          
+          <div className="settings-section__container-controls">
+            <div className="setting-control-container">
+              <div className="setting-label-container"><p>Image size:</p>  <p>{imageSize}px</p></div>
+              <input type="range" min={8} max={256} step={2} value={imageSize} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageSize(Number(e.target.value))}} />
+            </div>
+            <div className="setting-control-container">
+              <div className="setting-label-container"><p>View Scale:</p>  <p>{viewScale}x</p></div>
+              <input type="range" min={1} max={10} step={1} value={viewScale} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setViewScale(Number(e.target.value))}} />
+            </div>
           </div>
-          <div>
-            <p>View Scale: {viewScale}x</p>
-            <input type="range" min={1} max={10} step={1} value={viewScale} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setViewScale(Number(e.target.value))}} />
-          </div>
-        </div>
-      </section>
 
-      <section className="settings-section">
-        <h2>Opacity</h2>
-        <div className="settings-section__container-sliders">
-          <div>
-            <p>Total Opacity: {totalOpacity}%</p>
-            <input type="range" min={0} max={100} step={1} value={totalOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setTotalOpacity(Number(e.target.value))}} />
+        </section>
+
+        <section className="settings-section">
+          <h2>Opacity</h2>
+
+          <div className="settings-section__container-controls">
+            <div className="setting-control-container">
+              <div className="setting-label-container"><p>Total Opacity:</p>  <p>{totalOpacity}%</p></div>
+              <input type="range" min={0} max={100} step={1} value={totalOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setTotalOpacity(Number(e.target.value))}} />
+            </div>
+            <div className="setting-control-container">
+              <div className="setting-label-container"><p>Bright Opacity:</p>  <p>{brightOpacity}%</p></div>
+              <input type="range" min={0} max={100} step={1} value={brightOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setBrightOpacity(Number(e.target.value))}} />
+            </div>
+            <div className="setting-control-container">
+              <div className="setting-label-container"><p>Dark Opacity:</p>  <p>{darkOpacity}%</p></div>
+              <input type="range" min={0} max={100} step={1} value={darkOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setDarkOpacity(Number(e.target.value))}} />
+            </div>
           </div>
-          <div>
-            <p>Bright Opacity: {brightOpacity}%</p>
-            <input type="range" min={0} max={100} step={1} value={brightOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setBrightOpacity(Number(e.target.value))}} />
+        </section>
+        
+        <section className="settings-section">
+          <h2>Generation Settings:</h2>
+
+          <div className="settings-section__container-controls">
+            <div className="setting-control-container">
+              <div className="setting-label-container">
+                <p>Noise Seed:</p>
+                <div className="flex gap-1 items-center">
+                  <input type="text" className="input-number" value={seed} onChange={handleChangeInputSeed} />
+                  <TbReload className="text-xl hover:cursor-pointer select-none" onClick={()=>{setSeed(Math.floor(Math.random()*5000))}} />
+                </div>
+              </div>
+            </div>
+            <div className="setting-control-container">
+              <div className="setting-label-container"><p>Gray Levels:</p>  <p>{grayLevels}</p></div>
+              <input type="range" min={2} max={24} step={1} value={grayLevels} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setGrayLevels(Number(e.target.value))}} />
+            </div>
+            <div className="setting-control-container">
+              <div className="setting-label-container"><p>Steps per pixel:</p>  <p>{stepsPerPixel}</p></div>
+              <input type="range" min={1} max={16} step={1} value={stepsPerPixel} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setStepsPerPixel(Number(e.target.value))}} />
+            </div>
+            <div className="setting-control-container">
+              <div className="setting-label-container"><p>Noise X Scale::</p>  <p>{scale[0]-40}</p></div>
+              <input type="range" min={1} max={80} step={1} value={scale[0]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([Number(e.target.value), scale[1]])}} />
+            </div>
+            <div className="setting-control-container">
+              <div className="setting-label-container"><p>Noise Y Scale::</p>  <p>{scale[1]-40}</p></div>
+              <input type="range" min={1} max={80} step={1} value={scale[1]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([scale[0], Number(e.target.value)])}} />
+            </div>
           </div>
-          <div>
-            <p>Dark Opacity: {darkOpacity}%</p>
-            <input type="range" min={0} max={100} step={1} value={darkOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setDarkOpacity(Number(e.target.value))}} />
-          </div>
-        </div>
-      </section>
-      
-      
-      <section className="noise-canvas">
-        <h2>Generation Settings:</h2>
-        <div className="settings-section">
-          <div>
-            <p>Noise Seed: {seed}px</p>
-            <input type="number" value={seed} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setSeed(Number(e.target.value))}} />
-          </div>
-          <div>
-            <p>Gray Levels: {grayLevels}</p>
-            <input type="range" min={2} max={24} step={1} value={grayLevels} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setGrayLevels(Number(e.target.value))}} />
-          </div>
-          <div>
-            <p>steps per pixel: {stepsPerPixel}</p>
-            <input type="range" min={1} max={16} step={1} value={stepsPerPixel} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setStepsPerPixel(Number(e.target.value))}} />
-          </div>
-          <div>
-            <p>Noise X Scale: {scale[0]-40}</p>
-            <input type="range" min={1} max={80} step={1} value={scale[0]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([Number(e.target.value), scale[1]])}} />
-          </div>
-          <div>
-            <p>Noise Y Scale: {scale[1]-40}</p>
-            <input type="range" min={1} max={80} step={1} value={scale[1]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([scale[0], Number(e.target.value)])}} />
-          </div>
-        </div>
-      </section>
-      
+        </section>
+
+      </div>
+
       <button onClick={handleClickExportButton}>Export Image</button>
 
-      <canvas ref={canvasRef} style={{ opacity: `${totalOpacity}%`, transform: `scale(${viewScale})`, imageRendering: "pixelated" }} />
+      <div>
+        {/* <canvas ref={canvasRef} style={{ opacity: `${totalOpacity}%`, transform: `scale(${viewScale})`, imageRendering: "pixelated" }} /> */}
+      </div>
     </div>
   )
 }

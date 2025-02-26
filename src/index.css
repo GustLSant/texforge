@@ -14,3 +14,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.input-number{
+  @apply bg-neutral-50 text-black rounded-sm text-right pr-1 w-[80px];
+}

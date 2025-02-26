@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+.noise-canvas{
+    @apply max-w-lg flex flex-col border-2 border-white rounded-md;
+}
+
+.settings-section{
+    @apply flex flex-col gap-1 p-4;
+    
+    h2{
+        @apply text-xl font-bold text-left;
+    }
+}
+
+.settings-section__container-controls{
+    @apply flex flex-col gap-1;
+
+    .setting-control-container{
+        @apply flex flex-col items-stretch;
+    }
+
+    .setting-label-container{
+        @apply flex flex-row justify-between;
+    }
+}
+
