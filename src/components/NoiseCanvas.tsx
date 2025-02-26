@@ -1,25 +1,25 @@
 import React from "react";
 import { Noise } from "noisejs";
+import * as htmlToImage from 'html-to-image';
 
 
-interface NoiseCanvasProps {
-  size: number; // Tamanho total do canvas (padrão 256)
-  chunkSize: number; // Tamanho dos blocos (quanto maior, mais pixelizado)
-  scale: number; // Escala do Perlin Noise (define a suavidade)
-  levels: number; // Define quantos tons de cinza existem (2 = preto e branco, 4 = pixelado, etc.)
-}
-
-const defaultProps:NoiseCanvasProps = {
-  size: 256,
-  chunkSize: 16,
-  scale: 80,
-  levels: 256,
+function linearInterpolation(value:number, higherMultiplier:number, lowerMultiplier:number):number{
+  return ( value*higherMultiplier + (1-value)*lowerMultiplier )
 }
 
 
-export default function NoiseCanvasReact(props:NoiseCanvasProps = defaultProps):React.ReactElement{
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+export default function NoiseCanvas():React.ReactElement{
+  const [imageSize, setImageSize] = React.useState<number>(64)
+  const [viewScale, setViewScale] = React.useState<number>(2.0)
+  const [totalOpacity, setTotalOpacity] = React.useState<number>(100)
+  const [brightOpacity, setBrightOpacity] = React.useState<number>(100)
+  const [darkOpacity, setDarkOpacity] = React.useState<number>(100)
+  const [grayLevels, setGrayLevels] = React.useState<number>(4)
+  const [stepsPerPixel, setStepsPerPixel] = React.useState<number>(2)
+  const [scale, setScale] = React.useState<[number, number]>([40.0, 40.0])
   const [seed, setSeed] = React.useState<number>(0)
+  
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const noiseGen:Noise = React.useMemo<Noise>( ()=>{return new Noise(seed)}, [seed] ); // Criar gerador de noise
 
 
@@ -29,25 +29,115 @@ export default function NoiseCanvasReact(props:NoiseCanvasProps = defaultProps):
     const ctx:CanvasRenderingContext2D | null = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = props.size;
-    canvas.height = props.size;
+    canvas.width = imageSize;
+    canvas.height = imageSize;
 
-    for (let x=0; x<props.size; x+=props.chunkSize) {
-      for (let y=0; y<props.size; y+=props.chunkSize) {
-        let value = noiseGen.perlin2(x / props.scale, y / props.scale); // Gera Perlin Noise
-        value = (value + 1) / 2; // Normaliza de -1..1 para 0..1
+    for(let x=0; x<imageSize; x++){
+      for(let y=0; y<imageSize; y++){
+        let noiseValue = noiseGen.perlin2(
+          x * stepsPerPixel / scale[0],
+          y * stepsPerPixel / scale[1]
+        );
+        noiseValue = (noiseValue+1) / 2; // Normaliza de -1..1 para 0..1
 
-        // 🔹 Aplica "pixelização" nas transições reduzindo os níveis de cinza
-        const step = 1 / (props.levels - 1);
-        value = Math.round(value / step) * step;
+        // pixelização nas transições reduzindo os níveis de cinza
+        const stepSize = 1 / (grayLevels - 1); // se levels=16, entao terao 1/16 cores diferentes
+        noiseValue = Math.round(noiseValue / stepSize) * stepSize; // primeiro divide para saber em qual 'nivel' está, depois multiplica para ficar nos níveis especificados
 
-        const color = Math.floor(value * 255); // Converte para escala de cinza
+        const color = Math.floor(noiseValue * 255); // Converte de 0..1 para 1..255
 
-        ctx.fillStyle = `rgb(${color}, ${color}, ${color})`;
-        ctx.fillRect(x, y, props.chunkSize, props.chunkSize);
+        ctx.fillStyle = `rgba(${color}, ${color}, ${color}, ${linearInterpolation(noiseValue, brightOpacity, darkOpacity)})`;
+        ctx.fillRect(x, y, 1, 1);
       }
     }
-  }, [props.size, props.chunkSize, props.scale, props.levels]);
 
-  return <canvas ref={canvasRef} style={{ width: "100%", imageRendering: "pixelated" }} />;
+  }, [imageSize, viewScale, totalOpacity, brightOpacity, darkOpacity, grayLevels, stepsPerPixel, scale, seed]);
+
+
+  function handleClickExportButton():void{
+    if(!canvasRef.current) return
+    
+    htmlToImage
+    .toPng(canvasRef.current)
+    .then((dataUrl) => {
+      var link = document.createElement('a');
+      link.download = 'my-image-name.png';
+      link.href = dataUrl;
+      link.click();
+      document.removeChild(link)
+    })
+    .catch((err) => {
+      console.error('oops, something went wrong!', err);
+    });
+
+    return
+  }
+
+
+  return(
+    <div className="noise-canvas">
+      <section className="settings-section">
+        <h2>Size</h2>
+        <div className="settings-section__container-sliders">
+          <div>
+            <p>Image size: {imageSize}px</p>
+            <input type="range" min={8} max={256} step={2} value={imageSize} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageSize(Number(e.target.value))}} />
+          </div>
+          <div>
+            <p>View Scale: {viewScale}x</p>
+            <input type="range" min={1} max={10} step={1} value={viewScale} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setViewScale(Number(e.target.value))}} />
+          </div>
+        </div>
+      </section>
+
+      <section className="settings-section">
+        <h2>Opacity</h2>
+        <div className="settings-section__container-sliders">
+          <div>
+            <p>Total Opacity: {totalOpacity}%</p>
+            <input type="range" min={0} max={100} step={1} value={totalOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setTotalOpacity(Number(e.target.value))}} />
+          </div>
+          <div>
+            <p>Bright Opacity: {brightOpacity}%</p>
+            <input type="range" min={0} max={100} step={1} value={brightOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setBrightOpacity(Number(e.target.value))}} />
+          </div>
+          <div>
+            <p>Dark Opacity: {darkOpacity}%</p>
+            <input type="range" min={0} max={100} step={1} value={darkOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setDarkOpacity(Number(e.target.value))}} />
+          </div>
+        </div>
+      </section>
+      
+      
+      <section className="noise-canvas">
+        <h2>Generation Settings:</h2>
+        <div className="settings-section">
+          <div>
+            <p>Noise Seed: {seed}px</p>
+            <input type="number" value={seed} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setSeed(Number(e.target.value))}} />
+          </div>
+          <div>
+            <p>Gray Levels: {grayLevels}</p>
+            <input type="range" min={2} max={24} step={1} value={grayLevels} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setGrayLevels(Number(e.target.value))}} />
+          </div>
+          <div>
+            <p>steps per pixel: {stepsPerPixel}</p>
+            <input type="range" min={1} max={16} step={1} value={stepsPerPixel} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setStepsPerPixel(Number(e.target.value))}} />
+          </div>
+          <div>
+            <p>Noise X Scale: {scale[0]-40}</p>
+            <input type="range" min={1} max={80} step={1} value={scale[0]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([Number(e.target.value), scale[1]])}} />
+          </div>
+          <div>
+            <p>Noise Y Scale: {scale[1]-40}</p>
+            <input type="range" min={1} max={80} step={1} value={scale[1]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([scale[0], Number(e.target.value)])}} />
+          </div>
+        </div>
+      </section>
+      
+      <button onClick={handleClickExportButton}>Export Image</button>
+
+      <canvas ref={canvasRef} style={{ opacity: `${totalOpacity}%`, transform: `scale(${viewScale})`, imageRendering: "pixelated" }} />
+    </div>
+  )
 }
