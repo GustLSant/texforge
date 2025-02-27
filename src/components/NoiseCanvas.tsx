@@ -12,7 +12,7 @@ function linearInterpolation(value:number, higherMultiplier:number, lowerMultipl
 
 export default function NoiseCanvas():React.ReactElement{
   const [imageSize, setImageSize] = React.useState<number>(64)
-  const [viewScale, setViewScale] = React.useState<number>(2.0)
+  const [viewScale, setViewScale] = React.useState<number>(1.0)
   const [totalOpacity, setTotalOpacity] = React.useState<number>(100)
   const [brightOpacity, setBrightOpacity] = React.useState<number>(100)
   const [darkOpacity, setDarkOpacity] = React.useState<number>(100)
@@ -88,7 +88,7 @@ export default function NoiseCanvas():React.ReactElement{
   return(
     <div className="noise-canvas-component">
       
-      <div className="max-h-[30vh] overflow-y-scroll flex flex-col">
+      <div className="max-h-[50vh] overflow-y-scroll flex flex-col">
         
         <section className="settings-section">
           <h2>Size</h2>
@@ -166,7 +166,7 @@ export default function NoiseCanvas():React.ReactElement{
           <button onClick={handleClickExportButton} className="button-01 rounded-sm p-1 px-4 self-center hover:cursor-pointer">Export Image</button>
         </div>
 
-        <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, transform: `scale(${viewScale})`, imageRendering: "pixelated" }} />
+        <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, transform: `scale(${viewScale})`, margin: `${(viewScale-1) *(imageSize/2)}px`, imageRendering: "pixelated" }} />
       </div>
     </div>
   )
