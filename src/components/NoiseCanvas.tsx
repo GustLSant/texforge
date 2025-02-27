@@ -86,7 +86,7 @@ export default function NoiseCanvas():React.ReactElement{
 
 
   return(
-    <div className="noise-canvas">
+    <div className="noise-canvas-component">
       
       <div className="max-h-[30vh] overflow-y-scroll flex flex-col">
         
@@ -159,10 +159,14 @@ export default function NoiseCanvas():React.ReactElement{
 
       </div>
 
-      <button onClick={handleClickExportButton}>Export Image</button>
 
-      <div>
-        {/* <canvas ref={canvasRef} style={{ opacity: `${totalOpacity}%`, transform: `scale(${viewScale})`, imageRendering: "pixelated" }} /> */}
+      <div className="noise-container">
+        <div className="noise-container__header">
+          <h2 className="text-xl">Result:</h2>
+          <button onClick={handleClickExportButton} className="button-01 rounded-sm p-1 px-4 self-center hover:cursor-pointer">Export Image</button>
+        </div>
+
+        <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, transform: `scale(${viewScale})`, imageRendering: "pixelated" }} />
       </div>
     </div>
   )

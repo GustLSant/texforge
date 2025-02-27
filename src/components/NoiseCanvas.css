@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-.noise-canvas{
-    @apply max-w-lg flex flex-col border-2 border-white rounded-md;
+.noise-canvas-component{
+    @apply max-w-lg flex flex-col gap-2 border-2 border-white rounded-md;
 }
 
 .settings-section{
@@ -23,4 +23,17 @@
         @apply flex flex-row justify-between;
     }
 }
+
+.noise-container{
+    @apply flex flex-col items-start gap-2 p-4 overflow-auto;
+
+    .noise-container__header{
+        @apply flex self-stretch justify-between items-center;
+    }
+
+    .noise-canvas{
+        box-shadow: 4px 4px 4px rgb(0,0,0, 0.3);
+    }
+}
+
 
