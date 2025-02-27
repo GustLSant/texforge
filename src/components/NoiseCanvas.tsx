@@ -7,17 +7,19 @@ import './NoiseCanvas.css'
 
 function linearInterpolation(value:number, higherMultiplier:number, lowerMultiplier:number):number{
   return ( value*higherMultiplier + (1-value)*lowerMultiplier )
+  // return Math.min((1-value)*higherMultiplier, value*lowerMultiplier)
 }
 
 
 export default function NoiseCanvas():React.ReactElement{
-  const [imageSize, setImageSize] = React.useState<number>(64)
+  const [imageSize, setImageSize] = React.useState<number>(64)           // 32
   const [viewScale, setViewScale] = React.useState<number>(1.0)
   const [totalOpacity, setTotalOpacity] = React.useState<number>(100)
   const [brightOpacity, setBrightOpacity] = React.useState<number>(100)
   const [darkOpacity, setDarkOpacity] = React.useState<number>(100)
-  const [grayLevels, setGrayLevels] = React.useState<number>(4)
-  const [stepsPerPixel, setStepsPerPixel] = React.useState<number>(2)
+  const [grayLevels, setGrayLevels] = React.useState<number>(10)         // 9
+  const [stepsPerPixel, setStepsPerPixel] = React.useState<number>(2)    // 10
+  const [opacityThresholdFactor, setOpacityThresholdFactor] = React.useState<number>(1.0);
   const [scale, setScale] = React.useState<[number, number]>([40.0, 40.0])
   const [seed, setSeed] = React.useState<number>(1)
   
@@ -45,15 +47,18 @@ export default function NoiseCanvas():React.ReactElement{
         // pixelização nas transições reduzindo os níveis de cinza
         const stepSize = 1 / (grayLevels - 1); // se levels=16, entao terao 1/16 cores diferentes
         noiseValue = Math.round(noiseValue / stepSize) * stepSize; // primeiro divide para saber em qual 'nivel' está, depois multiplica para ficar nos níveis especificados
+        
+        // const color = Math.floor(noiseValue * 255); // Converte de 0..1 para 1..255
+        // ctx.fillStyle = `rgba(${color}, ${color}, ${color}, ${linearInterpolation(noiseValue, brightOpacity, darkOpacity)/100})`;
+        
+        const adjustedOpacity = Math.pow(1 - noiseValue, opacityThresholdFactor);
+        ctx.fillStyle = `rgba(0, 0, 0, ${adjustedOpacity})`;
 
-        const color = Math.floor(noiseValue * 255); // Converte de 0..1 para 1..255
-
-        ctx.fillStyle = `rgba(${color}, ${color}, ${color}, ${linearInterpolation(noiseValue, brightOpacity, darkOpacity)})`;
         ctx.fillRect(x, y, 1, 1);
       }
     }
 
-  }, [imageSize, viewScale, totalOpacity, brightOpacity, darkOpacity, grayLevels, stepsPerPixel, scale, seed]);
+  }, [imageSize, viewScale, totalOpacity, brightOpacity, darkOpacity, grayLevels, stepsPerPixel, opacityThresholdFactor, scale, seed]);
 
 
   function handleClickExportButton():void{
@@ -63,7 +68,7 @@ export default function NoiseCanvas():React.ReactElement{
     .toPng(canvasRef.current)
     .then((dataUrl) => {
       var link = document.createElement('a');
-      link.download = 'my-image-name.png';
+      link.download = 'generated-texture.png';
       link.href = dataUrl;
       link.click();
       document.removeChild(link)
@@ -145,6 +150,10 @@ export default function NoiseCanvas():React.ReactElement{
             <div className="setting-control-container">
               <div className="setting-label-container"><p>Steps per pixel:</p>  <p>{stepsPerPixel}</p></div>
               <input type="range" min={1} max={16} step={1} value={stepsPerPixel} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setStepsPerPixel(Number(e.target.value))}} />
+            </div>
+            <div className="setting-control-container">
+              <div className="setting-label-container"><p>Opacity Threshold:</p>  <p>{opacityThresholdFactor}</p></div>
+              <input type="range" min={0} max={10} step={1} value={opacityThresholdFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOpacityThresholdFactor(Number(e.target.value))}} />
             </div>
             <div className="setting-control-container">
               <div className="setting-label-container"><p>Noise X Scale::</p>  <p>{scale[0]-40}</p></div>
