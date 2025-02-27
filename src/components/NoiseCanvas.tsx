@@ -2,23 +2,23 @@ import React from "react";
 import { Noise } from "noisejs";
 import * as htmlToImage from 'html-to-image';
 import { TbReload } from "react-icons/tb";
+import { IoDice } from "react-icons/io5";
 import './NoiseCanvas.css'
 
 
 function linearInterpolation(value:number, higherMultiplier:number, lowerMultiplier:number):number{
   return ( value*higherMultiplier + (1-value)*lowerMultiplier )
-  // return Math.min((1-value)*higherMultiplier, value*lowerMultiplier)
 }
 
 
 export default function NoiseCanvas():React.ReactElement{
-  const [imageSize, setImageSize] = React.useState<number>(64)           // 32
+  const [imageSize, setImageSize] = React.useState<number>(64)
   const [viewScale, setViewScale] = React.useState<number>(1.0)
   const [totalOpacity, setTotalOpacity] = React.useState<number>(100)
   const [brightOpacity, setBrightOpacity] = React.useState<number>(100)
   const [darkOpacity, setDarkOpacity] = React.useState<number>(100)
-  const [grayLevels, setGrayLevels] = React.useState<number>(10)         // 9
-  const [stepsPerPixel, setStepsPerPixel] = React.useState<number>(2)    // 10
+  const [grayLevels, setGrayLevels] = React.useState<number>(9)
+  const [stepsPerPixel, setStepsPerPixel] = React.useState<number>(6)
   const [opacityThresholdFactor, setOpacityThresholdFactor] = React.useState<number>(1.0);
   const [scale, setScale] = React.useState<[number, number]>([40.0, 40.0])
   const [seed, setSeed] = React.useState<number>(1)
@@ -59,6 +59,39 @@ export default function NoiseCanvas():React.ReactElement{
     }
 
   }, [imageSize, viewScale, totalOpacity, brightOpacity, darkOpacity, grayLevels, stepsPerPixel, opacityThresholdFactor, scale, seed]);
+
+
+
+  function handleClickResetButton(_element:string):void{
+    switch(_element){
+      case 'totalOpacity':
+        setTotalOpacity(100)
+        break;
+      case 'brightOpacity':
+        setBrightOpacity(100)
+        break;
+      case 'darkOpacity':
+        setDarkOpacity(100)
+        break;
+      case 'grayLevels':
+        setGrayLevels(9)
+        break;
+      case 'stepsPerPixel':
+        setStepsPerPixel(6)
+        break;
+      case 'opacityThresholdFactor':
+        setOpacityThresholdFactor(1.0)
+        break;
+      case 'scale-X':
+        setScale([40.0, scale[1]])
+        break;
+      case 'scale-Y':
+        setScale([scale[0], 40.0])
+        break;
+      default:
+        break;
+    }
+  }
 
 
   function handleClickExportButton():void{
@@ -103,6 +136,7 @@ export default function NoiseCanvas():React.ReactElement{
               <div className="setting-label-container"><p>Image size:</p>  <p>{imageSize}px</p></div>
               <input type="range" min={8} max={256} step={2} value={imageSize} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageSize(Number(e.target.value))}} />
             </div>
+            
             <div className="setting-control-container">
               <div className="setting-label-container"><p>View Scale:</p>  <p>{viewScale}x</p></div>
               <input type="range" min={1} max={10} step={1} value={viewScale} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setViewScale(Number(e.target.value))}} />
@@ -116,15 +150,26 @@ export default function NoiseCanvas():React.ReactElement{
 
           <div className="settings-section__container-controls">
             <div className="setting-control-container">
-              <div className="setting-label-container"><p>Total Opacity:</p>  <p>{totalOpacity}%</p></div>
+              <div className="setting-label-container">
+                <p>Total Opacity:</p>
+                <div className="flex gap-1 items-center"><p>{totalOpacity}%</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('totalOpacity')}} /></div>
+              </div>
               <input type="range" min={0} max={100} step={1} value={totalOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setTotalOpacity(Number(e.target.value))}} />
             </div>
+
             <div className="setting-control-container">
-              <div className="setting-label-container"><p>Bright Opacity:</p>  <p>{brightOpacity}%</p></div>
+              <div className="setting-label-container">
+                <p>Bright Opacity:</p>
+                <div className="flex gap-1 items-center"><p>{brightOpacity}%</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('brightOpacity')}} /></div>
+              </div>
               <input type="range" min={0} max={100} step={1} value={brightOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setBrightOpacity(Number(e.target.value))}} />
             </div>
+
             <div className="setting-control-container">
-              <div className="setting-label-container"><p>Dark Opacity:</p>  <p>{darkOpacity}%</p></div>
+              <div className="setting-label-container">
+                <p>Dark Opacity:</p>
+                <div className="flex gap-1 items-center"><p>{darkOpacity}%</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('darkOpacity')}} /></div>
+              </div>
               <input type="range" min={0} max={100} step={1} value={darkOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setDarkOpacity(Number(e.target.value))}} />
             </div>
           </div>
@@ -134,33 +179,51 @@ export default function NoiseCanvas():React.ReactElement{
           <h2>Generation Settings:</h2>
 
           <div className="settings-section__container-controls">
-            <div className="setting-control-container">
-              <div className="setting-label-container">
-                <p>Noise Seed:</p>
-                <div className="flex gap-1 items-center">
-                  <input type="text" className="input-number" value={seed} onChange={handleChangeInputSeed} />
-                  <TbReload className="text-xl hover:cursor-pointer select-none" onClick={()=>{setSeed(Math.floor(Math.random()*5000))}} />
-                </div>
+            <div className="setting-label-container">
+              <p>Noise Seed:</p>
+              <div className="flex gap-1 items-center">
+                <input type="text" className="input-number" value={seed} onChange={handleChangeInputSeed} />
+                <IoDice className="svg-button" onClick={()=>{setSeed(Math.floor(Math.random()*5000))}} />
               </div>
             </div>
+
             <div className="setting-control-container">
-              <div className="setting-label-container"><p>Gray Levels:</p>  <p>{grayLevels}</p></div>
+              <div className="setting-label-container">
+                <p>Gray Levels:</p>
+                <div className="flex gap-1 items-center"><p>{grayLevels}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('grayLevels')}} /></div>
+              </div>
               <input type="range" min={2} max={24} step={1} value={grayLevels} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setGrayLevels(Number(e.target.value))}} />
             </div>
+
             <div className="setting-control-container">
-              <div className="setting-label-container"><p>Steps per pixel:</p>  <p>{stepsPerPixel}</p></div>
+              <div className="setting-label-container">
+                <p>Steps per pixel:</p>
+                <div className="flex gap-1 items-center"><p>{stepsPerPixel}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('stepsPerPixel')}} /></div>
+              </div>
               <input type="range" min={1} max={16} step={1} value={stepsPerPixel} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setStepsPerPixel(Number(e.target.value))}} />
             </div>
+
             <div className="setting-control-container">
-              <div className="setting-label-container"><p>Opacity Threshold:</p>  <p>{opacityThresholdFactor}</p></div>
+              <div className="setting-label-container">
+                <p>Opacity Threshold:</p>  
+                <div className="flex gap-1 items-center"><p>{opacityThresholdFactor}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('opacityThresholdFactor')}} /></div>
+              </div>
               <input type="range" min={0} max={10} step={1} value={opacityThresholdFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOpacityThresholdFactor(Number(e.target.value))}} />
             </div>
+
             <div className="setting-control-container">
-              <div className="setting-label-container"><p>Noise X Scale::</p>  <p>{scale[0]-40}</p></div>
+              <div className="setting-label-container">
+                <p>Noise X Scale::</p>  
+                <div className="flex gap-1 items-center"><p>{scale[0]-40}</p> <TbReload className="text-xl" onClick={()=>{handleClickResetButton('scale-X')}} /></div>
+              </div>
               <input type="range" min={1} max={80} step={1} value={scale[0]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([Number(e.target.value), scale[1]])}} />
             </div>
+
             <div className="setting-control-container">
-              <div className="setting-label-container"><p>Noise Y Scale::</p>  <p>{scale[1]-40}</p></div>
+              <div className="setting-label-container">
+                <p>Noise Y Scale::</p>
+                <div className="flex gap-1 items-center"><p>{scale[1]-40}</p> <TbReload className="text-xl" onClick={()=>{handleClickResetButton('scale-Y')}} /></div>
+              </div>
               <input type="range" min={1} max={80} step={1} value={scale[1]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([scale[0], Number(e.target.value)])}} />
             </div>
           </div>

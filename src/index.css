@@ -22,3 +22,7 @@
 .button-01{
   @apply bg-blue-500;
 }
+
+.svg-button{
+  @apply text-xl hover:cursor-pointer hover:scale-110 select-none;
+}
