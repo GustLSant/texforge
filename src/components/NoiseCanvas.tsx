@@ -1,10 +1,14 @@
 import React from "react";
-import { Noise } from "noisejs";
+// import { Noise } from "noisejs";
+import { createNoise2D } from 'simplex-noise';
 import { RgbColorPicker, RgbColor } from "react-colorful";
 import * as htmlToImage from 'html-to-image';
 import { TbReload } from "react-icons/tb";
 import { IoDice } from "react-icons/io5";
 import './NoiseCanvas.css'
+
+
+const noiseGen = createNoise2D(); // Criar gerador de noise
 
 
 export default function NoiseCanvas():React.ReactElement{
@@ -22,7 +26,6 @@ export default function NoiseCanvas():React.ReactElement{
   
   const [canShowColorPicker, setCanShowColorPicker] = React.useState<boolean>(false)
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const noiseGen:Noise = React.useMemo<Noise>( ()=>{return new Noise(seed)}, [seed] ); // Criar gerador de noise
 
 
   React.useEffect(() => {
@@ -36,7 +39,7 @@ export default function NoiseCanvas():React.ReactElement{
 
     for(let x=0; x<imageSize; x++){
       for(let y=0; y<imageSize; y++){
-        let noiseValue = noiseGen.perlin2(
+        let noiseValue = noiseGen(
           x * stepsPerPixel / scale[0],
           y * stepsPerPixel / scale[1]
         );
