@@ -17,6 +17,11 @@
 
     .setting-control-container{
         @apply flex flex-col items-stretch;
+
+        .noise-color-preview{
+            height: 20px;
+            width: 20px;
+        }
     }
 
     .setting-label-container{

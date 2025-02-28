@@ -1,5 +1,6 @@
 import React from "react";
 import { Noise } from "noisejs";
+import { RgbColorPicker, RgbColor } from "react-colorful";
 import * as htmlToImage from 'html-to-image';
 import { TbReload } from "react-icons/tb";
 import { IoDice } from "react-icons/io5";
@@ -14,6 +15,7 @@ function linearInterpolation(value:number, higherMultiplier:number, lowerMultipl
 export default function NoiseCanvas():React.ReactElement{
   const [imageSize, setImageSize] = React.useState<number>(64)
   const [viewScale, setViewScale] = React.useState<number>(1.0)
+  const [noiseColor, setNoiseColor] = React.useState<RgbColor>({r: 10, g: 5, b: 0});
   const [totalOpacity, setTotalOpacity] = React.useState<number>(100)
   const [brightOpacity, setBrightOpacity] = React.useState<number>(100)
   const [darkOpacity, setDarkOpacity] = React.useState<number>(100)
@@ -23,6 +25,7 @@ export default function NoiseCanvas():React.ReactElement{
   const [scale, setScale] = React.useState<[number, number]>([40.0, 40.0])
   const [seed, setSeed] = React.useState<number>(1)
   
+  const [canShowColorPicker, setCanShowColorPicker] = React.useState<boolean>(false)
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const noiseGen:Noise = React.useMemo<Noise>( ()=>{return new Noise(seed)}, [seed] ); // Criar gerador de noise
 
@@ -52,18 +55,21 @@ export default function NoiseCanvas():React.ReactElement{
         // ctx.fillStyle = `rgba(${color}, ${color}, ${color}, ${linearInterpolation(noiseValue, brightOpacity, darkOpacity)/100})`;
         
         const adjustedOpacity = Math.pow(1 - noiseValue, opacityThresholdFactor);
-        ctx.fillStyle = `rgba(0, 0, 0, ${adjustedOpacity})`;
+        ctx.fillStyle = `rgba(${noiseColor.r}, ${noiseColor.g}, ${noiseColor.b}, ${adjustedOpacity})`;
 
         ctx.fillRect(x, y, 1, 1);
       }
     }
 
-  }, [imageSize, viewScale, totalOpacity, brightOpacity, darkOpacity, grayLevels, stepsPerPixel, opacityThresholdFactor, scale, seed]);
+  }, [imageSize, viewScale, noiseColor, totalOpacity, brightOpacity, darkOpacity, grayLevels, stepsPerPixel, opacityThresholdFactor, scale, seed]);
 
 
 
   function handleClickResetButton(_element:string):void{
     switch(_element){
+      case 'color':
+        setNoiseColor({r: 10, g: 5, b: 0});
+        break;
       case 'totalOpacity':
         setTotalOpacity(100)
         break;
@@ -126,7 +132,7 @@ export default function NoiseCanvas():React.ReactElement{
   return(
     <div className="noise-canvas-component">
       
-      <div className="max-h-[50vh] overflow-y-scroll flex flex-col">
+      <div className="max-h-[80%] overflow-y-scroll flex flex-col">
         
         <section className="settings-section">
           <h2>Size</h2>
@@ -146,9 +152,21 @@ export default function NoiseCanvas():React.ReactElement{
         </section>
 
         <section className="settings-section">
-          <h2>Opacity</h2>
+          <h2>Color</h2>
 
           <div className="settings-section__container-controls">
+            <div className="setting-control-container">
+              <div className="setting-label-container">
+                <p>Noise Color:</p>
+                <div className="flex gap-1 items-center">
+                  {`R: ${noiseColor.r} , G: ${noiseColor.g} , B: ${noiseColor.b}`}
+                  <div className="noise-color-preview hover:cursor-pointer" onClick={()=>{setCanShowColorPicker((old)=>{return !old})}} style={{backgroundColor: `rgb(${noiseColor.r}, ${noiseColor.g}, ${noiseColor.b})`}}></div>
+                  <TbReload className="text-xl" onClick={()=>{handleClickResetButton('color')}} />
+                </div>
+              </div>
+              {canShowColorPicker && <RgbColorPicker color={noiseColor} onChange={(newColor:RgbColor)=>{setNoiseColor(newColor)}} className="self-end pt-1" />}
+            </div>
+
             <div className="setting-control-container">
               <div className="setting-label-container">
                 <p>Total Opacity:</p>
@@ -208,7 +226,7 @@ export default function NoiseCanvas():React.ReactElement{
                 <p>Opacity Threshold:</p>  
                 <div className="flex gap-1 items-center"><p>{opacityThresholdFactor}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('opacityThresholdFactor')}} /></div>
               </div>
-              <input type="range" min={0} max={10} step={1} value={opacityThresholdFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOpacityThresholdFactor(Number(e.target.value))}} />
+              <input type="range" min={0} max={10} step={0.1} value={opacityThresholdFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOpacityThresholdFactor(Number(e.target.value))}} />
             </div>
 
             <div className="setting-control-container">
