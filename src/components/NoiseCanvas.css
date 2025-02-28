@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 .noise-canvas-component{
-    @apply max-w-lg flex flex-col gap-2 border-2 border-white rounded-md;
+    @apply flex flex-col gap-2 border-2 border-white rounded-md;
 }
 
 .settings-section{

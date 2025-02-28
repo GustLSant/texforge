@@ -1,15 +1,10 @@
 import React from "react";
-import { Noise } from "noisejs";
+import Noise from "noisejs";
 import { RgbColorPicker, RgbColor } from "react-colorful";
 import * as htmlToImage from 'html-to-image';
 import { TbReload } from "react-icons/tb";
 import { IoDice } from "react-icons/io5";
 import './NoiseCanvas.css'
-
-
-function linearInterpolation(value:number, higherMultiplier:number, lowerMultiplier:number):number{
-  return ( value*higherMultiplier + (1-value)*lowerMultiplier )
-}
 
 
 export default function NoiseCanvas():React.ReactElement{

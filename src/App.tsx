@@ -1,12 +1,13 @@
-import React from 'react'
-import './App.css'
 import NoiseCanvas from './components/NoiseCanvas.tsx'
+import './App.css'
 
 
 function App() {
 
   return (
-    <div>
+    <div className='app'>
+      <div>a</div>
+      <div>a</div>
       <NoiseCanvas />
     </div>
   )
