@@ -1,5 +1,5 @@
 import React from "react";
-import Noise from "noisejs";
+import { Noise } from "noisejs";
 import { RgbColorPicker, RgbColor } from "react-colorful";
 import * as htmlToImage from 'html-to-image';
 import { TbReload } from "react-icons/tb";
