@@ -7,7 +7,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* background-color: #242424; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -20,7 +20,7 @@
 }
 
 .button-01{
-  @apply bg-blue-500;
+  @apply bg-blue-500 text-white;
 }
 
 .svg-button{

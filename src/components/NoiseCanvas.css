@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 .noise-canvas-component{
-    @apply flex flex-col gap-2 border-2 border-white rounded-md;
+    @apply flex flex-col gap-3 p-4;
 }
 
 .settings-section{
-    @apply flex flex-col gap-1 p-4;
+    @apply flex flex-col gap-3 pr-2;
     
     h2{
         @apply text-xl font-bold text-left;
@@ -30,7 +30,7 @@
 }
 
 .noise-container{
-    @apply flex flex-col items-start gap-2 p-4 overflow-auto;
+    @apply flex flex-col items-start gap-2 overflow-auto pr-2;
 
     .noise-container__header{
         @apply flex self-stretch justify-between items-center;

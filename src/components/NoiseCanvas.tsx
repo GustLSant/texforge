@@ -130,7 +130,7 @@ export default function NoiseCanvas():React.ReactElement{
   return(
     <div className="noise-canvas-component">
       
-      <div className="max-h-[80%] overflow-y-scroll flex flex-col">
+      <div className="max-h-[80%] overflow-y-scroll flex flex-col gap-3">
         
         <section className="settings-section">
           <h2>Size</h2>
@@ -192,7 +192,7 @@ export default function NoiseCanvas():React.ReactElement{
         </section>
         
         <section className="settings-section">
-          <h2>Generation Settings:</h2>
+          <h2>Generation Settings</h2>
 
           <div className="settings-section__container-controls">
             <div className="setting-label-container">
