@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.9",
+    "alea": "^1.0.1",
     "html-to-image": "^1.11.13",
     "react": "^19.0.0",
     "react-colorful": "^5.6.1",

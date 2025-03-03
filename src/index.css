@@ -20,9 +20,69 @@
 }
 
 .button-01{
-  @apply bg-blue-500 text-white;
+  @apply bg-orange-600 text-white;
 }
 
 .svg-button{
   @apply text-xl hover:cursor-pointer hover:scale-110 select-none;
 }
+
+
+
+input[type="range"]{
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: 4px;
+  width: 100%;
+  height: 6px;
+  background: transparent;
+  border-radius: 4px;
+  outline: none;
+}
+
+/* Estiliza o polegar do slider para navegadores baseados em WebKit (Chrome, Safari, Edge) */
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  @apply bg-orange-600;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  margin-top: -6px;
+}
+
+/* Estiliza o polegar do slider para Firefox */
+input[type="range"]::-moz-range-thumb{
+  width: 16px;
+  height: 16px;
+  @apply bg-orange-600;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  margin-top: -6px;
+}
+
+/* Cor do trilho preenchido antes do polegar para WebKit */
+input[type="range"]::-webkit-slider-runnable-track{
+  @apply bg-orange-900;
+  height: 6px;
+  border-radius: 4px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

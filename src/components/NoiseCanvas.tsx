@@ -1,29 +1,29 @@
 import React from "react";
-// import { Noise } from "noisejs";
-import { createNoise2D } from 'simplex-noise';
+import { createNoise2D, NoiseFunction2D } from 'simplex-noise';
 import { RgbColorPicker, RgbColor } from "react-colorful";
+import alea from 'alea';
 import * as htmlToImage from 'html-to-image';
 import { TbReload } from "react-icons/tb";
 import { IoDice } from "react-icons/io5";
 import './NoiseCanvas.css'
 
 
-const noiseGen = createNoise2D(); // Criar gerador de noise
-
-
 export default function NoiseCanvas():React.ReactElement{
-  const [imageSize, setImageSize] = React.useState<number>(64)
-  const [viewScale, setViewScale] = React.useState<number>(1.0)
+  const [imageWidth, setImageWidth] = React.useState<number>(64);
+  const [imageHeight, setImageHeight] = React.useState<number>(64);
+  const [viewScale, setViewScale] = React.useState<number>(1.0);
   const [noiseColor, setNoiseColor] = React.useState<RgbColor>({r: 10, g: 5, b: 0});
-  const [totalOpacity, setTotalOpacity] = React.useState<number>(100)
-  const [brightOpacity, setBrightOpacity] = React.useState<number>(100)
-  const [darkOpacity, setDarkOpacity] = React.useState<number>(100)
-  const [grayLevels, setGrayLevels] = React.useState<number>(9)
-  const [stepsPerPixel, setStepsPerPixel] = React.useState<number>(6)
+  const [totalOpacity, setTotalOpacity] = React.useState<number>(100);
+  const [brightOpacity, setBrightOpacity] = React.useState<number>(100);
+  const [darkOpacity, setDarkOpacity] = React.useState<number>(100);
+  const [grayLevels, setGrayLevels] = React.useState<number>(9);
+  const [stepsPerPixel, setStepsPerPixel] = React.useState<number>(6);
+  const [contrastFactor, setContrastFactor] = React.useState<number>(1.0);
   const [opacityThresholdFactor, setOpacityThresholdFactor] = React.useState<number>(1.0);
-  const [scale, setScale] = React.useState<[number, number]>([40.0, 40.0])
-  const [seed, setSeed] = React.useState<number>(1)
+  const [scale, setScale] = React.useState<[number, number]>([40.0, 40.0]);
+  const [seed, setSeed] = React.useState<number>(1);
   
+  const noiseGen:NoiseFunction2D = React.useMemo( ()=>{return createNoise2D(alea(seed))}, [seed] )
   const [canShowColorPicker, setCanShowColorPicker] = React.useState<boolean>(false)
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
@@ -34,11 +34,11 @@ export default function NoiseCanvas():React.ReactElement{
     const ctx:CanvasRenderingContext2D | null = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = imageSize;
-    canvas.height = imageSize;
+    canvas.width = imageWidth;
+    canvas.height = imageHeight;
 
-    for(let x=0; x<imageSize; x++){
-      for(let y=0; y<imageSize; y++){
+    for(let x=0; x<imageWidth; x++){
+      for(let y=0; y<imageHeight; y++){
         let noiseValue = noiseGen(
           x * stepsPerPixel / scale[0],
           y * stepsPerPixel / scale[1]
@@ -46,20 +46,21 @@ export default function NoiseCanvas():React.ReactElement{
         noiseValue = (noiseValue+1) / 2; // Normaliza de -1..1 para 0..1
 
         // pixelização nas transições reduzindo os níveis de cinza
-        const stepSize = 1 / (grayLevels - 1); // se levels=16, entao terao 1/16 cores diferentes
-        noiseValue = Math.round(noiseValue / stepSize) * stepSize; // primeiro divide para saber em qual 'nivel' está, depois multiplica para ficar nos níveis especificados
+        const stepWidth = 1 / (grayLevels - 1); // se levels=16, entao terao 1/16 cores diferentes
+        noiseValue = Math.round(noiseValue / stepWidth) * stepWidth; // primeiro divide para saber em qual 'nivel' está, depois multiplica para ficar nos níveis especificados
         
         // const color = Math.floor(noiseValue * 255); // Converte de 0..1 para 1..255
         // ctx.fillStyle = `rgba(${color}, ${color}, ${color}, ${linearInterpolation(noiseValue, brightOpacity, darkOpacity)/100})`;
         
-        const adjustedOpacity = Math.pow(1 - noiseValue, opacityThresholdFactor);
+        const contrastedNoiseValue = 0.5 + (noiseValue - 0.5) * contrastFactor;
+        const adjustedOpacity = Math.pow(1 - contrastedNoiseValue, opacityThresholdFactor);
         ctx.fillStyle = `rgba(${noiseColor.r}, ${noiseColor.g}, ${noiseColor.b}, ${adjustedOpacity})`;
 
         ctx.fillRect(x, y, 1, 1);
       }
     }
 
-  }, [imageSize, viewScale, noiseColor, totalOpacity, brightOpacity, darkOpacity, grayLevels, stepsPerPixel, opacityThresholdFactor, scale, seed]);
+  }, [imageWidth, imageHeight, viewScale, noiseColor, totalOpacity, brightOpacity, darkOpacity, grayLevels, stepsPerPixel, opacityThresholdFactor, contrastFactor, scale, seed]);
 
 
 
@@ -85,6 +86,9 @@ export default function NoiseCanvas():React.ReactElement{
         break;
       case 'opacityThresholdFactor':
         setOpacityThresholdFactor(1.0)
+        break;
+      case 'contrastFactor':
+        setContrastFactor(1.0);
         break;
       case 'scale-X':
         setScale([40.0, scale[1]])
@@ -133,14 +137,19 @@ export default function NoiseCanvas():React.ReactElement{
       <div className="max-h-[80%] overflow-y-scroll flex flex-col gap-3">
         
         <section className="settings-section">
-          <h2>Size</h2>
+          <h2>Width</h2>
           
           <div className="settings-section__container-controls">
             <div className="setting-control-container">
-              <div className="setting-label-container"><p>Image size:</p>  <p>{imageSize}px</p></div>
-              <input type="range" min={8} max={256} step={2} value={imageSize} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageSize(Number(e.target.value))}} />
+              <div className="setting-label-container"><p>Image Width:</p>  <p>{imageWidth}px</p></div>
+              <input type="range" min={2} max={128} step={2} value={imageWidth} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageWidth(Number(e.target.value))}} />
             </div>
             
+            <div className="setting-control-container">
+              <div className="setting-label-container"><p>Image Height:</p>  <p>{imageHeight}px</p></div>
+              <input type="range" min={2} max={128} step={2} value={imageHeight} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageHeight(Number(e.target.value))}} />
+            </div>
+
             <div className="setting-control-container">
               <div className="setting-label-container"><p>View Scale:</p>  <p>{viewScale}x</p></div>
               <input type="range" min={1} max={10} step={1} value={viewScale} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setViewScale(Number(e.target.value))}} />
@@ -175,6 +184,21 @@ export default function NoiseCanvas():React.ReactElement{
 
             <div className="setting-control-container">
               <div className="setting-label-container">
+                <p>Opacity Threshold:</p>  
+                <div className="flex gap-1 items-center"><p>{opacityThresholdFactor}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('opacityThresholdFactor')}} /></div>
+              </div>
+              <input type="range" min={1} max={7} step={0.1} value={opacityThresholdFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOpacityThresholdFactor(Number(e.target.value))}} />
+            </div>
+
+            <div className="setting-control-container">
+              <div className="setting-label-container">
+                <p>Contrast Factor:</p>  
+                <div className="flex gap-1 items-center"><p>{contrastFactor}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('contrastFactor')}} /></div>
+              </div>
+              <input type="range" min={0.1} max={2} step={0.1} value={contrastFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setContrastFactor(Number(e.target.value))}} />
+            </div>
+            {/* <div className="setting-control-container">
+              <div className="setting-label-container">
                 <p>Bright Opacity:</p>
                 <div className="flex gap-1 items-center"><p>{brightOpacity}%</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('brightOpacity')}} /></div>
               </div>
@@ -187,7 +211,7 @@ export default function NoiseCanvas():React.ReactElement{
                 <div className="flex gap-1 items-center"><p>{darkOpacity}%</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('darkOpacity')}} /></div>
               </div>
               <input type="range" min={0} max={100} step={1} value={darkOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setDarkOpacity(Number(e.target.value))}} />
-            </div>
+            </div> */}
           </div>
         </section>
         
@@ -221,14 +245,6 @@ export default function NoiseCanvas():React.ReactElement{
 
             <div className="setting-control-container">
               <div className="setting-label-container">
-                <p>Opacity Threshold:</p>  
-                <div className="flex gap-1 items-center"><p>{opacityThresholdFactor}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('opacityThresholdFactor')}} /></div>
-              </div>
-              <input type="range" min={0} max={10} step={0.1} value={opacityThresholdFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOpacityThresholdFactor(Number(e.target.value))}} />
-            </div>
-
-            <div className="setting-control-container">
-              <div className="setting-label-container">
                 <p>Noise X Scale::</p>  
                 <div className="flex gap-1 items-center"><p>{scale[0]-40}</p> <TbReload className="text-xl" onClick={()=>{handleClickResetButton('scale-X')}} /></div>
               </div>
@@ -254,7 +270,7 @@ export default function NoiseCanvas():React.ReactElement{
           <button onClick={handleClickExportButton} className="button-01 rounded-sm p-1 px-4 self-center hover:cursor-pointer">Export Image</button>
         </div>
 
-        <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, transform: `scale(${viewScale})`, margin: `${(viewScale-1) *(imageSize/2)}px`, imageRendering: "pixelated" }} />
+        <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, transform: `scale(${viewScale})`, margin: `${(viewScale-1) *(imageWidth/2)}px`, imageRendering: "pixelated" }} />
       </div>
     </div>
   )
