@@ -8,6 +8,9 @@ import { IoDice } from "react-icons/io5";
 import './NoiseCanvas.css'
 
 
+let flag_isExportingImage:boolean = false;
+
+
 export default function NoiseCanvas():React.ReactElement{
   const [imageWidth, setImageWidth] = React.useState<number>(64);
   const [imageHeight, setImageHeight] = React.useState<number>(64);
@@ -28,6 +31,7 @@ export default function NoiseCanvas():React.ReactElement{
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
 
+  // geracao do noise
   React.useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -60,8 +64,16 @@ export default function NoiseCanvas():React.ReactElement{
       }
     }
 
-  }, [imageWidth, imageHeight, viewScale, noiseColor, totalOpacity, brightOpacity, darkOpacity, grayLevels, scaleMultiplier, opacityThresholdFactor, contrastFactor, scale, seed]);
+  }, [imageWidth, imageHeight, noiseColor, totalOpacity, brightOpacity, darkOpacity, grayLevels, scaleMultiplier, opacityThresholdFactor, contrastFactor, scale, seed]);
 
+
+  // exportacao do noise
+  React.useEffect(()=>{
+    if(flag_isExportingImage){
+      exportImage()
+      flag_isExportingImage = false
+    }
+  }, [viewScale])
 
 
   function handleClickResetButton(_element:string):void{
@@ -102,7 +114,7 @@ export default function NoiseCanvas():React.ReactElement{
   }
 
 
-  function handleClickExportButton():void{
+  function exportImage():void{
     if(!canvasRef.current) { console.error('Error: canvas is not valid.'); return; }
     
     htmlToImage
@@ -119,6 +131,17 @@ export default function NoiseCanvas():React.ReactElement{
     });
 
     return
+  }
+
+
+  function handleClickExportButton():void{
+    if(viewScale !== 1.0){
+      flag_isExportingImage = true;
+      setViewScale(1.0);
+    }
+    else{
+      exportImage();
+    }
   }
 
 
