@@ -148,7 +148,7 @@ export default function NoiseCanvas():React.ReactElement{
   function handleChangeInputSeed(e:React.ChangeEvent<HTMLInputElement>):void{
     const numberInput = Number(e.target.value);
     if(isNaN(numberInput)) return;
-    else if(numberInput > 65535) return; // a lib so consegue lidar com valores entre 1 e 65536
+    else if(numberInput > 65535) return;
     else if(numberInput === 0) setSeed(1);
     else setSeed(numberInput);
   }
