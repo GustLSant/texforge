@@ -103,7 +103,7 @@ export default function NoiseCanvas():React.ReactElement{
 
 
   function handleClickExportButton():void{
-    if(!canvasRef.current) return
+    if(!canvasRef.current) { console.error('Error: canvas is not valid.'); return; }
     
     htmlToImage
     .toPng(canvasRef.current)
@@ -115,7 +115,7 @@ export default function NoiseCanvas():React.ReactElement{
       document.removeChild(link)
     })
     .catch((err) => {
-      console.error('oops, something went wrong!', err);
+      console.error('Error on exporting image: ', err);
     });
 
     return
