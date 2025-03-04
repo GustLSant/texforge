@@ -9,6 +9,7 @@ import './NoiseCanvas.css'
 
 
 let flag_isExportingImage:boolean = false;
+let oldViewScale:number = 1.0;
 
 
 export default function NoiseCanvas():React.ReactElement{
@@ -70,7 +71,7 @@ export default function NoiseCanvas():React.ReactElement{
   // exportacao do noise
   React.useEffect(()=>{
     if(flag_isExportingImage){
-      exportImage()
+      exportImage(true)
       flag_isExportingImage = false
     }
   }, [viewScale])
@@ -114,7 +115,7 @@ export default function NoiseCanvas():React.ReactElement{
   }
 
 
-  function exportImage():void{
+  function exportImage(_hasChangedViewScale:boolean=false):void{
     if(!canvasRef.current) { console.error('Error: canvas is not valid.'); return; }
     
     htmlToImage
@@ -124,7 +125,7 @@ export default function NoiseCanvas():React.ReactElement{
       link.download = 'generated-texture.png';
       link.href = dataUrl;
       link.click();
-      document.removeChild(link)
+      if(_hasChangedViewScale){ setViewScale(oldViewScale); }
     })
     .catch((err) => {
       console.error('Error on exporting image: ', err);
@@ -137,6 +138,7 @@ export default function NoiseCanvas():React.ReactElement{
   function handleClickExportButton():void{
     if(viewScale !== 1.0){
       flag_isExportingImage = true;
+      oldViewScale = viewScale;
       setViewScale(1.0);
     }
     else{
