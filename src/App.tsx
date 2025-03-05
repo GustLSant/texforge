@@ -6,9 +6,9 @@ function App() {
 
   return (
     <div className='app'>
-      <div>a</div>
-      <div>a</div>
+      <div className='main-section'>Seção UV e ??</div>
       <NoiseCanvas />
+      <div className='main-section'>Seção config e preview3D</div>
     </div>
   )
 }

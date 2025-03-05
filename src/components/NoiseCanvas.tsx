@@ -159,129 +159,120 @@ export default function NoiseCanvas():React.ReactElement{
   return(
     <div className="noise-canvas-component">
       
-      <div className="max-h-[80%] overflow-y-scroll flex flex-col gap-3">
+      <div className="main-section">
+        <div className="h-full overflow-y-scroll flex flex-col gap-3">
         
-        <section className="settings-section">
-          <h2>Width</h2>
-          
-          <div className="settings-section__container-controls">
-            <div className="setting-control-container" id="image-width">
-              <div className="setting-label-container"><p>Image Width:</p>  <p>{imageWidth}px</p></div>
-              <input type="range" min={2} max={128} step={2} value={imageWidth} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageWidth(Number(e.target.value))}} />
+          <section className="settings-section">
+            <h2>Width</h2>
+        
+            <div className="settings-section__container-controls">
+              <div className="setting-control-container" id="image-width">
+                <div className="setting-label-container"><p>Image Width:</p>  <p>{imageWidth}px</p></div>
+                <input type="range" min={2} max={128} step={2} value={imageWidth} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageWidth(Number(e.target.value))}} />
+              </div>
+        
+              <div className="setting-control-container" id='image-height'>
+                <div className="setting-label-container"><p>Image Height:</p>  <p>{imageHeight}px</p></div>
+                <input type="range" min={2} max={128} step={2} value={imageHeight} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageHeight(Number(e.target.value))}} />
+              </div>
+              <div className="setting-control-container" id="view-scale">
+                <div className="setting-label-container"><p>View Scale:</p>  <p>{viewScale}x</p></div>
+                <input type="range" min={1} max={10} step={1} value={viewScale} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setViewScale(Number(e.target.value))}} />
+              </div>
             </div>
-            
-            <div className="setting-control-container" id='image-height'>
-              <div className="setting-label-container"><p>Image Height:</p>  <p>{imageHeight}px</p></div>
-              <input type="range" min={2} max={128} step={2} value={imageHeight} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageHeight(Number(e.target.value))}} />
+          </section>
+          <section className="settings-section">
+            <h2>Color</h2>
+            <div className="settings-section__container-controls">
+              <div className="setting-control-container" id="noise-color">
+                <div className="setting-label-container">
+                  <p>Noise Color:</p>
+                  <div className="flex gap-1 items-center">
+                    {`R: ${noiseColor.r} , G: ${noiseColor.g} , B: ${noiseColor.b}`}
+                    <div className="noise-color-preview hover:cursor-pointer" onClick={()=>{setCanShowColorPicker((old)=>{return !old})}} style={{backgroundColor: `rgb(${noiseColor.r}, ${noiseColor.g}, ${noiseColor.b})`}}></div>
+                    <TbReload className="text-xl" onClick={()=>{handleClickResetButton('color')}} />
+                  </div>
+                </div>
+                {canShowColorPicker && <RgbColorPicker color={noiseColor} onChange={(newColor:RgbColor)=>{setNoiseColor(newColor)}} className="self-end pt-1" />}
+              </div>
+              <div className="setting-control-container" id="total-opacity">
+                <div className="setting-label-container">
+                  <p>Total Opacity:</p>
+                  <div className="flex gap-1 items-center"><p>{totalOpacity}%</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('totalOpacity')}} /></div>
+                </div>
+                <input type="range" min={0} max={100} step={1} value={totalOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setTotalOpacity(Number(e.target.value))}} />
+              </div>
+              <div className="setting-control-container" id="noise-threshold">
+                <div className="setting-label-container">
+                  <p>Opacity Threshold:</p>
+                  <div className="flex gap-1 items-center"><p>{opacityThresholdFactor}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('opacityThresholdFactor')}} /></div>
+                </div>
+                <input type="range" min={1} max={7} step={0.1} value={opacityThresholdFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOpacityThresholdFactor(Number(e.target.value))}} />
+              </div>
+              <div className="setting-control-container" id="contrast-factor">
+                <div className="setting-label-container">
+                  <p>Contrast Factor:</p>
+                  <div className="flex gap-1 items-center"><p>{contrastFactor}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('contrastFactor')}} /></div>
+                </div>
+                <input type="range" min={0.1} max={2} step={0.1} value={contrastFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setContrastFactor(Number(e.target.value))}} />
+              </div>
             </div>
-
-            <div className="setting-control-container" id="view-scale">
-              <div className="setting-label-container"><p>View Scale:</p>  <p>{viewScale}x</p></div>
-              <input type="range" min={1} max={10} step={1} value={viewScale} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setViewScale(Number(e.target.value))}} />
-            </div>
-          </div>
-
-        </section>
-
-        <section className="settings-section">
-          <h2>Color</h2>
-
-          <div className="settings-section__container-controls">
-            <div className="setting-control-container" id="noise-color">
-              <div className="setting-label-container">
-                <p>Noise Color:</p>
+          </section>
+        
+          <section className="settings-section">
+            <h2>Generation Settings</h2>
+            <div className="settings-section__container-controls">
+              <div className="setting-label-container" id="noise-seed">
+                <p>Noise Seed:</p>
                 <div className="flex gap-1 items-center">
-                  {`R: ${noiseColor.r} , G: ${noiseColor.g} , B: ${noiseColor.b}`}
-                  <div className="noise-color-preview hover:cursor-pointer" onClick={()=>{setCanShowColorPicker((old)=>{return !old})}} style={{backgroundColor: `rgb(${noiseColor.r}, ${noiseColor.g}, ${noiseColor.b})`}}></div>
-                  <TbReload className="text-xl" onClick={()=>{handleClickResetButton('color')}} />
+                  <input type="text" className="input-number" value={seed} onChange={handleChangeInputSeed} />
+                  <IoDice className="svg-button" onClick={()=>{setSeed(Math.floor(Math.random()*5000))}} />
                 </div>
               </div>
-              {canShowColorPicker && <RgbColorPicker color={noiseColor} onChange={(newColor:RgbColor)=>{setNoiseColor(newColor)}} className="self-end pt-1" />}
-            </div>
-
-            <div className="setting-control-container" id="total-opacity">
-              <div className="setting-label-container">
-                <p>Total Opacity:</p>
-                <div className="flex gap-1 items-center"><p>{totalOpacity}%</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('totalOpacity')}} /></div>
+              <div className="setting-control-container" id="gray-levels">
+                <div className="setting-label-container">
+                  <p>Gray Levels:</p>
+                  <div className="flex gap-1 items-center"><p>{grayLevels}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('grayLevels')}} /></div>
+                </div>
+                <input type="range" min={2} max={24} step={1} value={grayLevels} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setGrayLevels(Number(e.target.value))}} />
               </div>
-              <input type="range" min={0} max={100} step={1} value={totalOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setTotalOpacity(Number(e.target.value))}} />
-            </div>
-
-            <div className="setting-control-container" id="noise-threshold">
-              <div className="setting-label-container">
-                <p>Opacity Threshold:</p>  
-                <div className="flex gap-1 items-center"><p>{opacityThresholdFactor}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('opacityThresholdFactor')}} /></div>
+              <div className="setting-control-container" id="scale-multiplier">
+                <div className="setting-label-container">
+                  <p>Scale Multiplier:</p>
+                  <div className="flex gap-1 items-center"><p>{(scaleMultiplier+0.95).toFixed(3)}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('scaleMultiplier')}} /></div>
+                </div>
+                <input type="range" min={0.01} max={0.15} step={0.005} value={scaleMultiplier} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScaleMultiplier(Number(e.target.value))}} />
               </div>
-              <input type="range" min={1} max={7} step={0.1} value={opacityThresholdFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOpacityThresholdFactor(Number(e.target.value))}} />
-            </div>
-
-            <div className="setting-control-container" id="contrast-factor">
-              <div className="setting-label-container">
-                <p>Contrast Factor:</p>  
-                <div className="flex gap-1 items-center"><p>{contrastFactor}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('contrastFactor')}} /></div>
+              <div className="setting-control-container" id="scale-x">
+                <div className="setting-label-container">
+                  <p>Noise X Scale::</p>
+                  <div className="flex gap-1 items-center"><p>{scale[0]}</p> <TbReload className="text-xl" onClick={()=>{handleClickResetButton('scale-X')}} /></div>
+                </div>
+                <input type="range" min={0.2} max={10} step={0.2} value={scale[0]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([Number(e.target.value), scale[1]])}} />
               </div>
-              <input type="range" min={0.1} max={2} step={0.1} value={contrastFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setContrastFactor(Number(e.target.value))}} />
-            </div>
-          </div>
-        </section>
-        
-        <section className="settings-section">
-          <h2>Generation Settings</h2>
-
-          <div className="settings-section__container-controls">
-            <div className="setting-label-container" id="noise-seed">
-              <p>Noise Seed:</p>
-              <div className="flex gap-1 items-center">
-                <input type="text" className="input-number" value={seed} onChange={handleChangeInputSeed} />
-                <IoDice className="svg-button" onClick={()=>{setSeed(Math.floor(Math.random()*5000))}} />
+              <div className="setting-control-container" id="scale-y">
+                <div className="setting-label-container">
+                  <p>Noise Y Scale::</p>
+                  <div className="flex gap-1 items-center"><p>{scale[1]}</p> <TbReload className="text-xl" onClick={()=>{handleClickResetButton('scale-Y')}} /></div>
+                </div>
+                <input type="range" min={0.2} max={10} step={0.2} value={scale[1]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([scale[0], Number(e.target.value)])}} />
               </div>
             </div>
-
-            <div className="setting-control-container" id="gray-levels">
-              <div className="setting-label-container">
-                <p>Gray Levels:</p>
-                <div className="flex gap-1 items-center"><p>{grayLevels}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('grayLevels')}} /></div>
-              </div>
-              <input type="range" min={2} max={24} step={1} value={grayLevels} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setGrayLevels(Number(e.target.value))}} />
-            </div>
-
-            <div className="setting-control-container" id="scale-multiplier">
-              <div className="setting-label-container">
-                <p>Scale Multiplier:</p>
-                <div className="flex gap-1 items-center"><p>{(scaleMultiplier+0.95).toFixed(3)}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('scaleMultiplier')}} /></div>
-              </div>
-              <input type="range" min={0.01} max={0.15} step={0.005} value={scaleMultiplier} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScaleMultiplier(Number(e.target.value))}} />
-            </div>
-
-            <div className="setting-control-container" id="scale-x">
-              <div className="setting-label-container">
-                <p>Noise X Scale::</p>  
-                <div className="flex gap-1 items-center"><p>{scale[0]}</p> <TbReload className="text-xl" onClick={()=>{handleClickResetButton('scale-X')}} /></div>
-              </div>
-              <input type="range" min={0.2} max={10} step={0.2} value={scale[0]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([Number(e.target.value), scale[1]])}} />
-            </div>
-
-            <div className="setting-control-container" id="scale-y">
-              <div className="setting-label-container">
-                <p>Noise Y Scale::</p>
-                <div className="flex gap-1 items-center"><p>{scale[1]}</p> <TbReload className="text-xl" onClick={()=>{handleClickResetButton('scale-Y')}} /></div>
-              </div>
-              <input type="range" min={0.2} max={10} step={0.2} value={scale[1]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([scale[0], Number(e.target.value)])}} />
-            </div>
-          </div>
-        </section>
-
+          </section>
+        </div>
       </div>
 
 
-      <div className="noise-container">
-        <div className="noise-container__header">
+    <div className="main-section">
+      <div className="noise-container h-full">
+        <div className="noise-container__header sticky top-0 z-10 bg-neutral-800">
           <h2 className="text-xl">Result:</h2>
           <button onClick={handleClickExportButton} className="button-01 rounded-sm p-1 px-4 self-center hover:cursor-pointer">Export Image</button>
         </div>
-
         <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, transform: `scale(${viewScale})`, margin: `${(viewScale-1) *(imageWidth/2)}px`, imageRendering: "pixelated" }} />
       </div>
+    </div>
+
     </div>
   )
 }
