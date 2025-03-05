@@ -1,8 +1,7 @@
 @import "tailwindcss";
 
 .app{
-    background-position: top bottom;
-    background-image: radial-gradient(at 25% 75%, rgb(80, 20, 0), rgb(20, 10, 10));
+    background-image: radial-gradient(at 10% 125%, rgb(80, 20, 0), rgb(20, 10, 10));
     @apply w-screen h-screen flex gap-4 p-4 pt-10;
 
     /* rgb(255, 75, 0) */
