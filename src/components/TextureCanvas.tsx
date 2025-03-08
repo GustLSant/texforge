@@ -35,7 +35,7 @@ export default function TextureCanvas():ReactElement{
     return(
         <div className="texture-canvas main-section">
             <div className="flex flex-row justify-between items-center gap-2">
-                <p>Name:</p>
+                <p>Texture Name:</p>
                 <div className="flex flex-row gap-2 items-center">
                     <p className="break-all">{file?.name}</p>
                     <button className="button-01" onClick={()=>{fileInputRef.current?.click()}}>Upload Texture</button>
