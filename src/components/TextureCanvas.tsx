@@ -4,7 +4,7 @@ import React, { ReactElement, useRef } from "react";
 export default function TextureCanvas():ReactElement{
     const [file, setFile] = React.useState<File>();
     const [imageData, setImageData] = React.useState<string | undefined>();
-    const imageDivRef = useRef(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
 
     function handleChangeFileInput(event: React.ChangeEvent<HTMLInputElement>):void{
@@ -25,8 +25,14 @@ export default function TextureCanvas():ReactElement{
 
     return(
         <div className="texture-canvas main-section">
-            <p>Name: {file?.name}</p>
-            <input type="file" onChange={handleChangeFileInput} accept="image/*" />
+            <div className="flex flex-row justify-between items-center">
+                <p>Name:</p>
+                <div>
+                    {file?.name}
+                    <button className="button-01" onClick={()=>{fileInputRef.current?.click()}}>Upload Texture</button>
+                </div>
+            </div>
+            <input ref={fileInputRef} type="file" onChange={handleChangeFileInput} accept="image/*" className="absolute top-[-50px] left-[-50px] opacity-0" />
             {
                 imageData && 
                 <img src={imageData} alt="" />
