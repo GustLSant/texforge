@@ -1,3 +1,4 @@
+import TextureCanvas from './components/TextureCanvas.tsx'
 import NoiseCanvas from './components/NoiseCanvas.tsx'
 import './App.css'
 
@@ -6,7 +7,7 @@ function App() {
 
   return (
     <div className='app'>
-      <div className='main-section'>Seção UV e ??</div>
+      <TextureCanvas />
       <NoiseCanvas />
       <div className='main-section'>Seção config e preview3D</div>
     </div>
