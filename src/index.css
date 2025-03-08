@@ -20,7 +20,7 @@
 }
 
 .button-01{
-  @apply bg-orange-600 text-white;
+  @apply bg-orange-600 text-white rounded-sm p-1 px-4 hover:cursor-pointer;
 }
 
 .svg-button{
