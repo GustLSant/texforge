@@ -9,7 +9,7 @@ function App() {
     <div className='app'>
       <TextureCanvas />
       <NoiseCanvas />
-      <div className='main-section'>Seção config e preview3D</div>
+      {/* <div className='main-section'>Seção config e preview3D</div> */}
     </div>
   )
 }

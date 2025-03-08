@@ -15,6 +15,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.main-section{
+  @apply grow shrink basis-0 bg-neutral-800 rounded-md text-white;
+  box-shadow: 4px 4px 4px rgba(0,0,0, 0.2);
+}
+
 .input-number{
   @apply bg-neutral-50 text-black rounded-sm text-right pr-1 w-[80px];
 }

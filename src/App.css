@@ -2,16 +2,12 @@
 
 .app{
     background-image: radial-gradient(at 10% 125%, rgb(80, 20, 0), rgb(20, 10, 10));
-    @apply w-screen h-screen flex gap-4 p-4 pt-10;
+    @apply w-screen h-screen grid grid-rows-1 grid-cols-2 gap-4 p-4 pt-10;
 
     /* rgb(255, 75, 0) */
     /* backgroundPosition: 'top left', backgroundImage: `radial-gradient(at 30% 30%, ${currentHexColorsArray.join(', ')})` */
 }
 
-.main-section{
-    @apply grow shrink basis-0 bg-neutral-800 rounded-md text-white;
-    box-shadow: 4px 4px 4px rgba(0,0,0, 0.2);
-}
 
 /*
 flex-basis: 0 faz com que a div tenha o menor tamanho possivel, 0
