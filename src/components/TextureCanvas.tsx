@@ -1,4 +1,5 @@
 import React, { ReactElement, useRef } from "react";
+import DraggableTexture from "./DraggableTexture/DraggableTexture";
 import "./TextureCanvas.css"
 
 
@@ -44,11 +45,12 @@ export default function TextureCanvas():ReactElement{
             
             <input ref={fileInputRef} type="file" onChange={handleChangeFileInput} accept="image/*" className="absolute top-[-50px] left-[-50px] opacity-0" />
             
-            <div className="bg-neutral-900 rounded-md p-1 overflow-auto" style={{height: '100%', boxShadow: '2px 2px 4px 4px rgba(0,0,0, 0.25) inset'}}>
+            <div className="bg-neutral-900 rounded-md p-1 overflow-auto relative" style={{height: '100%', boxShadow: '2px 2px 4px 4px rgba(0,0,0, 0.25) inset'}}>
                 {
                     imageData &&
                     <img src={imageData} style={{width: `${imageSize[0]}px`, height: `${imageSize[1]}px`, maxWidth: 'none', maxHeight: 'none', transform: `scale(${imageZoom})`, margin: `${(imageZoom-1)*(imageSize[0]/2)}px ${(imageZoom-1)*(imageSize[1]/2)}px`, imageRendering: "pixelated"}} alt="" />
                 }
+                <DraggableTexture />
             </div>
 
             <div className="flex items-center gap-2">
