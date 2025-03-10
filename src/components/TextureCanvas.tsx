@@ -1,5 +1,5 @@
 import React, { ReactElement, useRef } from "react";
-import DraggableTexture from "./DraggableTexture/DraggableTexture";
+import OverlayTextureComponent from "./OverlayTexture/OverlayTexture";
 import "./TextureCanvas.css"
 
 
@@ -9,7 +9,7 @@ export default function TextureCanvas():ReactElement{
     const [imageSize, setImageSize] = React.useState<[number, number]>([0, 0]);
     const [imageZoom, setImageZoom] = React.useState<number>(1.0);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
+    
 
     function handleChangeFileInput(event: React.ChangeEvent<HTMLInputElement>):void{
         if(event.target.files){
@@ -50,7 +50,7 @@ export default function TextureCanvas():ReactElement{
                     imageData &&
                     <img src={imageData} style={{width: `${imageSize[0]}px`, height: `${imageSize[1]}px`, maxWidth: 'none', maxHeight: 'none', zoom: `${imageZoom}`, imageRendering: "pixelated"}} alt="" />
                 }
-                <DraggableTexture zoom={imageZoom} />
+                <OverlayTextureComponent zoom={imageZoom} />
             </div>
 
             <div className="flex items-center gap-2">
