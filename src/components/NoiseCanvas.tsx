@@ -269,7 +269,7 @@ export default function NoiseCanvas():React.ReactElement{
           <h2 className="text-xl">Result:</h2>
           <button onClick={handleClickExportButton} className="button-01 self-center">Export Image</button>
         </div>
-        <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, transform: `scale(${viewScale})`, margin: `${(viewScale-1) *(imageHeight/2)}px  ${(viewScale-1) *(imageWidth/2)}px`, imageRendering: "pixelated" }} />
+        <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, zoom: viewScale, imageRendering: "pixelated" }} />
       </div>
     </div>
 
