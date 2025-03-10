@@ -1,6 +1,6 @@
 import React from "react";
 
-type PropsDraggableTexture = {
+type PropsOverlayTexture = {
     zoom:number
 }
 
@@ -10,7 +10,7 @@ let offsetY = 0;
 let isDragging = false;
 
 
-export default function DraggableTexture({zoom}:PropsDraggableTexture){
+export default function OverlayTextureComponent({zoom}:PropsOverlayTexture){
     const divRef = React.useRef<HTMLDivElement | null>(null);
 
 
