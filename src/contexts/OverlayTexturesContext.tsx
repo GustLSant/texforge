@@ -14,22 +14,7 @@ export const OverlayTexturesContext = createContext<OverlayTexturesContextType |
 
 
 export default function OverlayTexturesProvider({ children }:PropsWithChildren){
-    const [overlayTextures, setOverlayTextures] = useState<OverlayTextureType[]>([
-        {
-            id: 0,
-            imageData: "",
-            position: {x: 0, y: 0},
-            opacity: 100,
-            zoom: 1,
-        },
-        {
-            id: 1,
-            imageData: "",
-            position: {x: 0, y: 200},
-            opacity: 100,
-            zoom: 1,
-        },
-    ]);
+    const [overlayTextures, setOverlayTextures] = useState<OverlayTextureType[]>([]);
 
 
     function updateTexturePosition(_id:number, _newPos: Position2D){
@@ -37,8 +22,8 @@ export default function OverlayTexturesProvider({ children }:PropsWithChildren){
         
         for(let i=0; i<newOverlayTextures.length; i++){
             if(newOverlayTextures[i].id === _id){
-                newOverlayTextures[i].position.x = _newPos.x;
-                newOverlayTextures[i].position.y = _newPos.y;
+                newOverlayTextures[i].position.x = Math.round(_newPos.x);
+                newOverlayTextures[i].position.y = Math.round(_newPos.y);
                 break;
             }
         }
@@ -66,7 +51,6 @@ export default function OverlayTexturesProvider({ children }:PropsWithChildren){
             imageData: textureData,
             position: {x: Math.random()*20, y: Math.random()*20},
             opacity: 100,
-            zoom: 1,
         });
         
         setOverlayTextures(newTextures);

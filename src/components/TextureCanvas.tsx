@@ -67,13 +67,12 @@ export default function TextureCanvas():ReactElement{
                             <OverlayTextureComponent 
                                 key={idx}
                                 {...data}
+                                zoom={imageZoom}
                             />
                         )
                     })
                 }
             </div>
-
-            <p title={JSON.stringify(overlayTexturesContext?.overlayTextures)}>aiwdjaijdw</p>
         </div>
     )
 }

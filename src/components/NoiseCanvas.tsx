@@ -151,7 +151,15 @@ export default function NoiseCanvas():React.ReactElement{
 
 
   function handleClickAddToCanvasButton():void{
-    overlayTexturesContext?.addTexture("")
+    if(!canvasRef.current){ return };
+
+    htmlToImage.toPng(canvasRef.current)
+    .then((dataUrl) => {
+      overlayTexturesContext?.addTexture(dataUrl);
+    })
+    .catch((err) => {
+      console.error('Error generating image for overlay texture: ', err);
+    });
   }
 
 

@@ -8,5 +8,4 @@ export type OverlayTextureType = {
     imageData: string,
     position: Position2D,
     opacity: number,
-    zoom: number,
 }
