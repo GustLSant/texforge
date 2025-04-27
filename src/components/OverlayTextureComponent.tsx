@@ -17,7 +17,6 @@ export default function OverlayTextureComponent(props:OverlayTextureProps){
         left: `${props.position.x}px`,
         top: `${props.position.y}px`,
         opacity: `${props.opacity}%`,
-        zoom: props.zoom,
         imageRendering: 'pixelated',
     }
     
