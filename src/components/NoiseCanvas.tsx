@@ -1,4 +1,5 @@
 import React from "react";
+import { OverlayTexturesContext, OverlayTexturesContextType } from "../contexts/OverlayTexturesContext";
 import { createNoise2D, NoiseFunction2D } from 'simplex-noise';
 import { RgbColorPicker, RgbColor } from "react-colorful";
 import alea from 'alea';
@@ -30,6 +31,8 @@ export default function NoiseCanvas():React.ReactElement{
   const noiseGen:NoiseFunction2D = React.useMemo( ()=>{return createNoise2D(alea(seed))}, [seed] )
   const [canShowColorPicker, setCanShowColorPicker] = React.useState<boolean>(false)
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
+
+  const overlayTexturesContext: OverlayTexturesContextType | undefined = React.useContext(OverlayTexturesContext)
 
 
   // geracao do noise
@@ -115,6 +118,18 @@ export default function NoiseCanvas():React.ReactElement{
   }
 
 
+  function handleClickExportButton():void{
+    if(viewScale !== 1.0){
+      flag_isExportingImage = true;
+      oldViewScale = viewScale;
+      setViewScale(1.0);
+    }
+    else{
+      exportImage();
+    }
+  }
+
+
   function exportImage(_hasChangedViewScale:boolean=false):void{
     if(!canvasRef.current) { console.error('Error: canvas is not valid.'); return; }
     
@@ -135,15 +150,8 @@ export default function NoiseCanvas():React.ReactElement{
   }
 
 
-  function handleClickExportButton():void{
-    if(viewScale !== 1.0){
-      flag_isExportingImage = true;
-      oldViewScale = viewScale;
-      setViewScale(1.0);
-    }
-    else{
-      exportImage();
-    }
+  function handleClickAddToCanvasButton():void{
+    overlayTexturesContext?.addTexture("")
   }
 
 
@@ -267,7 +275,10 @@ export default function NoiseCanvas():React.ReactElement{
       <div className="noise-container h-full">
         <div className="noise-container__header sticky top-0 z-10 bg-neutral-800">
           <h2 className="text-xl">Result:</h2>
-          <button onClick={handleClickExportButton} className="button-01 self-center">Export Image</button>
+          <div className="flex flex-row gap-2 items-center">
+            <button onClick={handleClickAddToCanvasButton} className="button-01 self-center">Add to Canvas</button>
+            <button onClick={handleClickExportButton} className="button-01 self-center">Export Image</button>
+          </div>
         </div>
         <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, zoom: viewScale, imageRendering: "pixelated" }} />
       </div>

@@ -63,10 +63,18 @@ export default function TextureCanvas():ReactElement{
                 }
                 {
                     overlayTexturesContext?.overlayTextures.map((data, idx)=>{
-                        return <OverlayTextureComponent key={idx} {...data}  />
+                        return(
+                            <OverlayTextureComponent 
+                                key={idx}
+                                {...data}
+                                handlePosChangeFunc={overlayTexturesContext.updateTexturePosition}
+                            />
+                        )
                     })
                 }
             </div>
+
+            <p title={JSON.stringify(overlayTexturesContext?.overlayTextures)}>aiwdjaijdw</p>
         </div>
     )
 }
