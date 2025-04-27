@@ -67,7 +67,6 @@ export default function TextureCanvas():ReactElement{
                             <OverlayTextureComponent 
                                 key={idx}
                                 {...data}
-                                handlePosChangeFunc={overlayTexturesContext.updateTexturePosition}
                             />
                         )
                     })

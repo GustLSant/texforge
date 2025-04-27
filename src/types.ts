@@ -9,5 +9,4 @@ export type OverlayTextureType = {
     position: Position2D,
     opacity: number,
     zoom: number,
-    handlePosChangeFunc: (id:number, pos: Position2D) => void,
 }

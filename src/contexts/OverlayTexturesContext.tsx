@@ -2,7 +2,7 @@ import { PropsWithChildren, useState } from "react";
 import { createContext } from "react";
 import { OverlayTextureType, Position2D } from "../types";
 
-
+// tipo das propriedades e funções exportadas pelo Context
 export type OverlayTexturesContextType = {
     overlayTextures: OverlayTextureType[],
     addTexture: (textureData: string) => void,
@@ -21,7 +21,6 @@ export default function OverlayTexturesProvider({ children }:PropsWithChildren){
             position: {x: 0, y: 0},
             opacity: 100,
             zoom: 1,
-            handlePosChangeFunc: updateTexturePosition,
         },
         {
             id: 1,
@@ -29,7 +28,6 @@ export default function OverlayTexturesProvider({ children }:PropsWithChildren){
             position: {x: 0, y: 200},
             opacity: 100,
             zoom: 1,
-            handlePosChangeFunc: updateTexturePosition,
         },
     ]);
 
@@ -69,7 +67,6 @@ export default function OverlayTexturesProvider({ children }:PropsWithChildren){
             position: {x: Math.random()*20, y: Math.random()*20},
             opacity: 100,
             zoom: 1,
-            handlePosChangeFunc: updateTexturePosition,
         });
         
         setOverlayTextures(newTextures);

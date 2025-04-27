@@ -1,4 +1,5 @@
 import React from "react";
+import { OverlayTexturesContext, OverlayTexturesContextType } from "../contexts/OverlayTexturesContext";
 import { OverlayTextureType } from "../types";
 
 let offsetX = 0;
@@ -7,6 +8,7 @@ let isDragging = false;
 
 
 export default function OverlayTextureComponent(props:OverlayTextureType){
+    const overlayTexturesContext: OverlayTexturesContextType | undefined = React.useContext(OverlayTexturesContext)
     const divRef = React.useRef<HTMLDivElement | null>(null);
 
 
@@ -25,7 +27,7 @@ export default function OverlayTextureComponent(props:OverlayTextureType){
     function handleMouseMove(e:MouseEvent){
         if (!isDragging || !divRef.current) return;
 
-        props.handlePosChangeFunc(
+        overlayTexturesContext?.updateTexturePosition(
             props.id,
             {
                 x: (e.clientX)/props.zoom - offsetX,
