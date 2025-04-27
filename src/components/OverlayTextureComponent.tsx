@@ -14,10 +14,12 @@ export default function OverlayTextureComponent(props:OverlayTextureProps){
     const divRef = React.useRef<HTMLDivElement | null>(null);
     let divStyle: CSSProperties = {
         // backgroundColor: `rgb(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255})`,
-        left: `${props.position.x}px`,
-        top: `${props.position.y}px`,
-        opacity: `${props.opacity}%`,
+        left:      props.position.x + 'px',
+        top:       props.position.y + 'px',
+        opacity:   props.opacity + '%',
         imageRendering: 'pixelated',
+        minWidth:  props.width + 'px',
+        minHeight: props.height + 'px,'
     }
     
     function handleMouseDown(e:React.MouseEvent<HTMLDivElement>){

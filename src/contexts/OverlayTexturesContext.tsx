@@ -43,13 +43,15 @@ export default function OverlayTexturesProvider({ children }:PropsWithChildren){
     }
 
 
-    function addTexture(textureData: string): void{
+    function addTexture(textureData: string, imageWidth: number, imageHeight: number): void{
         const newTextures = [...overlayTextures];
         
         newTextures.push({
             id: getNextAvailableId(),
             imageData: textureData,
             position: {x: Math.random()*20, y: Math.random()*20},
+            width: imageWidth,
+            height: imageHeight,
             opacity: 100,
         });
         
