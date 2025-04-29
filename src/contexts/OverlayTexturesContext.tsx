@@ -5,7 +5,7 @@ import { OverlayTextureType, Position2D } from "../types";
 // tipo das propriedades e funções exportadas pelo Context
 export type OverlayTexturesContextType = {
     overlayTextures: OverlayTextureType[],
-    addTexture: (textureData: string) => void,
+    addTexture: (textureData: string, width: number, height: number) => void,
     removeTexture: (textureId: number) => void,
     updateTexturePosition: (id: number, newPos: Position2D) => void
 };
@@ -43,15 +43,15 @@ export default function OverlayTexturesProvider({ children }:PropsWithChildren){
     }
 
 
-    function addTexture(textureData: string, imageWidth: number, imageHeight: number): void{
+    function addTexture(textureData: string, width: number, height: number): void{
         const newTextures = [...overlayTextures];
         
         newTextures.push({
             id: getNextAvailableId(),
             imageData: textureData,
             position: {x: Math.random()*20, y: Math.random()*20},
-            width: imageWidth,
-            height: imageHeight,
+            width: width,
+            height: height,
             opacity: 100,
         });
         

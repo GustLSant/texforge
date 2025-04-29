@@ -10,6 +10,7 @@ import './NoiseCanvas.css'
 
 
 let flag_isExportingImage:boolean = false;
+let flag_isAddingTextureToContext:boolean = false;
 let oldViewScale:number = 1.0;
 
 
