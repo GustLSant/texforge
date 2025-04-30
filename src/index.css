@@ -15,6 +15,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.shadow-01{
+  box-shadow: 4px 4px 4px rgba(0,0,0, 0.2);
+}
+
 .main-section{
   @apply grow shrink basis-0 bg-neutral-800 rounded-md text-white;
   box-shadow: 4px 4px 4px rgba(0,0,0, 0.2);
@@ -26,6 +30,7 @@
 
 .button-01{
   @apply bg-orange-600 text-white rounded-sm p-1 px-4 hover:cursor-pointer;
+  box-shadow: 4px 4px 4px rgba(0,0,0, 0.2);
 }
 
 .svg-button{

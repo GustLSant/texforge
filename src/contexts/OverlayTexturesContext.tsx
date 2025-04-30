@@ -7,7 +7,8 @@ export type OverlayTexturesContextType = {
     overlayTextures: OverlayTextureType[],
     addTexture: (textureData: string, width: number, height: number) => void,
     removeTexture: (textureId: number) => void,
-    updateTexturePosition: (id: number, newPos: Position2D) => void
+    updateTexturePosition: (id: number, newPos: Position2D) => void,
+    updateTextureOpacity: (id: number, newOpacity: number) => void,
 };
 
 export const OverlayTexturesContext = createContext<OverlayTexturesContextType | undefined>(undefined);
@@ -24,6 +25,20 @@ export default function OverlayTexturesProvider({ children }:PropsWithChildren){
             if(newOverlayTextures[i].id === _id){
                 newOverlayTextures[i].position.x = Math.round(_newPos.x);
                 newOverlayTextures[i].position.y = Math.round(_newPos.y);
+                break;
+            }
+        }
+        
+        setOverlayTextures(newOverlayTextures);
+    }
+
+
+    function updateTextureOpacity(_id: number, _newOpacity: number){
+        const newOverlayTextures:OverlayTextureType[] = [...overlayTextures];
+        
+        for(let i=0; i<newOverlayTextures.length; i++){
+            if(newOverlayTextures[i].id === _id){
+                newOverlayTextures[i].opacity = _newOpacity
                 break;
             }
         }
@@ -70,7 +85,7 @@ export default function OverlayTexturesProvider({ children }:PropsWithChildren){
 
 
     return(
-        <OverlayTexturesContext.Provider value={{ overlayTextures, addTexture, removeTexture, updateTexturePosition }}>
+        <OverlayTexturesContext.Provider value={{ overlayTextures, addTexture, removeTexture, updateTexturePosition, updateTextureOpacity }}>
             {children}
         </OverlayTexturesContext.Provider>
     )

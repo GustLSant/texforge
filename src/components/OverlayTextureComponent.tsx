@@ -74,6 +74,7 @@ export default function OverlayTextureComponent(props:OverlayTextureProps){
         }
     };
     
+    // Controla a visibilidade do PopUp
     React.useEffect(() => {
         if(isPopUpOpen){ document.addEventListener('mousedown', handleClickOutside); }
         else{ document.removeEventListener('mousedown', handleClickOutside); }
@@ -85,23 +86,41 @@ export default function OverlayTextureComponent(props:OverlayTextureProps){
     }, [isPopUpOpen]);
 
 
+    function handleChangeOpacitySlider(_newValue: number){
+        overlayTexturesContext?.updateTextureOpacity(props.id, _newValue)
+    }
+
+
+    function handleClickDeleteTexture(){
+        overlayTexturesContext?.removeTexture(props.id)
+    }
+    
+
     return(
         // <div ref={divRef} style={{backgroundColor: `rgb(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255})`,  left: `${props.position.x}px`, top: `${props.position.y}px`, opacity: `${props.opacity}%`, zoom: props.zoom}} className="draggable-texture w-20 h-20 absolute hover:cursor-move" onMouseDown={handleMouseDown} >
         <>
-            <div ref={divRef} style={divStyle} className="absolute hover:cursor-move" onMouseDown={handleMouseDown} onContextMenu={handleRightClick} >
+            <div ref={divRef} style={divStyle} className={`absolute hover:cursor-move ${(isPopUpOpen) ? 'outline-1 outline-orange-600' : ''}`} onMouseDown={handleMouseDown} onContextMenu={handleRightClick} >
                 <img src={props.imageData} className="pointer-events-none" />
             </div>
 
             {
                 isPopUpOpen &&
-                <div ref={popUpRef} className="fixed bg-neutral-700 p-1 gap-1 rounded-sm" style={{top: popUpPosition.y, left: popUpPosition.x}}>
-                    <div className="flex items-center gap-1">
-                        <BiSolidTrash />
-                        <p onClick={()=>{setIsPopUpOpen(false)}}>Delete Texture</p>
-                    </div>
-                    <div>
-                        <p>Opacity: </p>
-                        <input type="range" name="opacity" />
+                <div ref={popUpRef} className="fixed bg-neutral-700 p-2 rounded-sm shadow-01" style={{top: popUpPosition.y, left: popUpPosition.x, zoom: 1.0/props.zoom}}>
+                    <div className="flex gap-2 flex-col">
+                        <div>
+                            <p>Opacity: </p>
+                            <div className="flex items-center gap-2">
+                                <input type="range" min={0} max={100} step={1} value={props.opacity} onChange={(e)=>{handleChangeOpacitySlider(Number(e.target.value))}} name="opacity" />
+                                <p>{props.opacity}%</p>
+                            </div>
+                        </div>
+                        
+                        <div className="h-[1px] self-stretch opacity-15 bg-orange-600"></div>
+
+                        <div className="flex items-center gap-2 hover:cursor-pointer hover:underline" onClick={handleClickDeleteTexture}>
+                            <BiSolidTrash />
+                            <p onClick={()=>{setIsPopUpOpen(false)}}>Delete Texture</p>
+                        </div>
                     </div>
                 </div>
             }
