@@ -15,8 +15,8 @@ let oldViewScale:number = 1.0;
 
 
 export default function NoiseCanvas():React.ReactElement{
-  const [imageWidth, setImageWidth] = React.useState<number>(64);
-  const [imageHeight, setImageHeight] = React.useState<number>(64);
+  const [textureWidth, setTextureWidth] = React.useState<number>(64);
+  const [textureHeight, setTextureHeight] = React.useState<number>(64);
   const [viewScale, setViewScale] = React.useState<number>(1.0);
   const [noiseColor, setNoiseColor] = React.useState<RgbColor>({r: 10, g: 5, b: 0});
   const [totalOpacity, setTotalOpacity] = React.useState<number>(100);
@@ -43,11 +43,11 @@ export default function NoiseCanvas():React.ReactElement{
     const ctx:CanvasRenderingContext2D | null = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = imageWidth;
-    canvas.height = imageHeight;
+    canvas.width = textureWidth;
+    canvas.height = textureHeight;
 
-    for(let x=0; x<imageWidth; x++){
-      for(let y=0; y<imageHeight; y++){
+    for(let x=0; x<textureWidth; x++){
+      for(let y=0; y<textureHeight; y++){
         let noiseValue = noiseGen(
           x * scaleMultiplier / scale[0],
           y * scaleMultiplier / scale[1]
@@ -69,7 +69,7 @@ export default function NoiseCanvas():React.ReactElement{
       }
     }
 
-  }, [imageWidth, imageHeight, noiseColor, totalOpacity, brightOpacity, darkOpacity, grayLevels, scaleMultiplier, opacityThresholdFactor, contrastFactor, scale, seed]);
+  }, [textureWidth, textureHeight, noiseColor, totalOpacity, brightOpacity, darkOpacity, grayLevels, scaleMultiplier, opacityThresholdFactor, contrastFactor, scale, seed]);
 
 
   // exportacao do noise
@@ -147,7 +147,7 @@ export default function NoiseCanvas():React.ReactElement{
       if(_hasChangedViewScale){ setViewScale(oldViewScale); }
     })
     .catch((err) => {
-      console.error('Error on exporting image: ', err);
+      console.error('Error on exporting texture: ', err);
     });
 
     return
@@ -170,11 +170,11 @@ export default function NoiseCanvas():React.ReactElement{
     
     htmlToImage.toPng(canvasRef.current)
     .then((dataUrl) => {
-      overlayTexturesContext?.addTexture(dataUrl, imageWidth, imageHeight);
+      overlayTexturesContext?.addTexture(dataUrl, textureWidth, textureHeight);
       if(_hasChangedViewScale){ setViewScale(oldViewScale); }
     })
     .catch((err) => {
-      console.error('Error generating image for overlay texture: ', err);
+      console.error('Error generating texture for overlay texture: ', err);
     });
   }
 
@@ -198,14 +198,14 @@ export default function NoiseCanvas():React.ReactElement{
             <h2>Width</h2>
         
             <div className="settings-section__container-controls">
-              <div className="setting-control-container" id="image-width">
-                <div className="setting-label-container"><p>Image Width:</p>  <p>{imageWidth}px</p></div>
-                <input type="range" min={2} max={128} step={2} value={imageWidth} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageWidth(Number(e.target.value))}} />
+              <div className="setting-control-container" id="texture-width">
+                <div className="setting-label-container"><p>Texture Width:</p>  <p>{textureWidth}px</p></div>
+                <input type="range" min={2} max={128} step={2} value={textureWidth} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setTextureWidth(Number(e.target.value))}} />
               </div>
         
-              <div className="setting-control-container" id='image-height'>
-                <div className="setting-label-container"><p>Image Height:</p>  <p>{imageHeight}px</p></div>
-                <input type="range" min={2} max={128} step={2} value={imageHeight} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setImageHeight(Number(e.target.value))}} />
+              <div className="setting-control-container" id='texture-height'>
+                <div className="setting-label-container"><p>Texture Height:</p>  <p>{textureHeight}px</p></div>
+                <input type="range" min={2} max={128} step={2} value={textureHeight} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setTextureHeight(Number(e.target.value))}} />
               </div>
               <div className="setting-control-container" id="view-scale">
                 <div className="setting-label-container"><p>View Scale:</p>  <p>{viewScale}x</p></div>
@@ -239,14 +239,14 @@ export default function NoiseCanvas():React.ReactElement{
                   <p>Opacity Threshold:</p>
                   <div className="flex gap-1 items-center"><p>{opacityThresholdFactor}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('opacityThresholdFactor')}} /></div>
                 </div>
-                <input type="range" min={1} max={7} step={0.1} value={opacityThresholdFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOpacityThresholdFactor(Number(e.target.value))}} />
+                <input type="range" min={1.0} max={10.0} step={0.1} value={opacityThresholdFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOpacityThresholdFactor(Number(e.target.value))}} />
               </div>
               <div className="setting-control-container" id="contrast-factor">
                 <div className="setting-label-container">
                   <p>Contrast Factor:</p>
                   <div className="flex gap-1 items-center"><p>{contrastFactor}</p><TbReload className="text-xl" onClick={()=>{handleClickResetButton('contrastFactor')}} /></div>
                 </div>
-                <input type="range" min={0.1} max={2} step={0.1} value={contrastFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setContrastFactor(Number(e.target.value))}} />
+                <input type="range" min={0.1} max={8.0} step={0.1} value={contrastFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setContrastFactor(Number(e.target.value))}} />
               </div>
             </div>
           </section>
@@ -301,7 +301,7 @@ export default function NoiseCanvas():React.ReactElement{
           <h2 className="text-xl">Result:</h2>
           <div className="flex flex-row gap-2 items-center">
             <button onClick={handleClickAddToCanvasButton} className="button-01 self-center">Add to Canvas</button>
-            <button onClick={handleClickExportButton} className="button-01 self-center">Export Image</button>
+            <button onClick={handleClickExportButton} className="button-01 self-center">Export Texture</button>
           </div>
         </div>
         <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, zoom: viewScale, imageRendering: "pixelated" }} />
