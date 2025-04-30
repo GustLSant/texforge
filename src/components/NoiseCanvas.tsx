@@ -9,7 +9,7 @@ import { IoDice } from "react-icons/io5";
 import './NoiseCanvas.css'
 
 
-let flag_isExportingImage:boolean = false;
+let flag_isExportingTexture:boolean = false;
 let flag_isAddingTextureToContext:boolean = false;
 let oldViewScale:number = 1.0;
 
@@ -74,9 +74,13 @@ export default function NoiseCanvas():React.ReactElement{
 
   // exportacao do noise
   React.useEffect(()=>{
-    if(flag_isExportingImage){
-      exportImage(true)
-      flag_isExportingImage = false
+    if(flag_isExportingTexture){
+      exportTexture(true)
+      flag_isExportingTexture = false
+    }
+    if(flag_isAddingTextureToContext){
+      addTextureToCanvas(true)
+      flag_isAddingTextureToContext = false
     }
   }, [viewScale])
 
@@ -121,17 +125,16 @@ export default function NoiseCanvas():React.ReactElement{
 
   function handleClickExportButton():void{
     if(viewScale !== 1.0){
-      flag_isExportingImage = true;
+      flag_isExportingTexture = true;
       oldViewScale = viewScale;
       setViewScale(1.0);
     }
     else{
-      exportImage();
+      exportTexture();
     }
   }
 
-
-  function exportImage(_hasChangedViewScale:boolean=false):void{
+  function exportTexture(_hasChangedViewScale:boolean=false):void{
     if(!canvasRef.current) { console.error('Error: canvas is not valid.'); return; }
     
     htmlToImage
@@ -152,11 +155,23 @@ export default function NoiseCanvas():React.ReactElement{
 
 
   function handleClickAddToCanvasButton():void{
-    if(!canvasRef.current){ return };
+    if(viewScale !== 1.0){
+      flag_isAddingTextureToContext = true;
+      oldViewScale = viewScale;
+      setViewScale(1.0);
+    }
+    else{
+      addTextureToCanvas();
+    }
+  }
 
+  function addTextureToCanvas(_hasChangedViewScale:boolean=false):void{
+    if(!canvasRef.current) { console.error('Error: canvas is not valid.'); return; }
+    
     htmlToImage.toPng(canvasRef.current)
     .then((dataUrl) => {
       overlayTexturesContext?.addTexture(dataUrl, imageWidth, imageHeight);
+      if(_hasChangedViewScale){ setViewScale(oldViewScale); }
     })
     .catch((err) => {
       console.error('Error generating image for overlay texture: ', err);
