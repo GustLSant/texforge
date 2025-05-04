@@ -1,15 +1,19 @@
 @import "tailwindcss";
 
 .noise-canvas-component{
-    @apply grid grid-cols-1 grid-rows-2 gap-3 grow shrink basis-0;
+    @apply grid grid-cols-1 grid-rows-2 gap-3;
 
     & > div{
         @apply p-4;
     }
+
+    & svg:hover{
+        cursor: pointer;
+    }
 }
 
 .settings-section{
-    @apply flex flex-col gap-3 pr-2;
+    @apply flex flex-col gap-2 pr-2;
     
     h2{
         @apply text-xl font-bold text-left;
@@ -17,10 +21,10 @@
 }
 
 .settings-section__container-controls{
-    @apply flex flex-col gap-1;
+    @apply flex flex-col gap-2;
 
     .setting-control-container{
-        @apply flex flex-col items-stretch;
+        @apply flex flex-col items-stretch gap-1;
 
         .noise-color-preview{
             height: 20px;

@@ -2,8 +2,10 @@ import React from "react";
 import { OverlayTexturesContext, OverlayTexturesContextType } from "../contexts/OverlayTexturesContext";
 import { createNoise2D, NoiseFunction2D } from 'simplex-noise';
 import { RgbColorPicker, RgbColor } from "react-colorful";
+import { TranspGradientType } from "../types";
 import alea from 'alea';
 import * as htmlToImage from 'html-to-image';
+import TransparencyGradientSettings from "./NoiseSettingsComponents/TransparencyGradientSettings";
 import { TbReload } from "react-icons/tb";
 import { IoDice } from "react-icons/io5";
 import './NoiseCanvas.css'
@@ -28,6 +30,7 @@ export default function NoiseCanvas():React.ReactElement{
   const [opacityThresholdFactor, setOpacityThresholdFactor] = React.useState<number>(1.0);
   const [scale, setScale] = React.useState<[number, number]>([1.0, 1.0]);
   const [seed, setSeed] = React.useState<number>(1);
+  const [transpGradients, setTranspGradients] = React.useState<TranspGradientType>({tb: 0.0, bt: 0.0, rl: 0.0, lr: 0.0})
   
   const noiseGen:NoiseFunction2D = React.useMemo( ()=>{return createNoise2D(alea(seed))}, [seed] )
   const [canShowColorPicker, setCanShowColorPicker] = React.useState<boolean>(false)
@@ -57,19 +60,46 @@ export default function NoiseCanvas():React.ReactElement{
         // pixelização nas transições reduzindo os níveis de cinza
         const stepWidth = 1 / (grayLevels - 1); // se levels=16, entao terao 1/16 cores diferentes
         noiseValue = Math.round(noiseValue / stepWidth) * stepWidth; // primeiro divide para saber em qual 'nivel' está, depois multiplica para ficar nos níveis especificados
-        
-        // const color = Math.floor(noiseValue * 255); // Converte de 0..1 para 1..255
-        // ctx.fillStyle = `rgba(${color}, ${color}, ${color}, ${linearInterpolation(noiseValue, brightOpacity, darkOpacity)/100})`;
-        
+                
+        // aplicacao do efeito de transparencia do gradiente
+        let gradTranspMultiplierFactor: number = getTranspGradientMultiplierFactor(x, y)
+
         const contrastedNoiseValue = 0.5 + (noiseValue - 0.5) * contrastFactor;
         const adjustedOpacity = Math.pow(1 - contrastedNoiseValue, opacityThresholdFactor);
-        ctx.fillStyle = `rgba(${noiseColor.r}, ${noiseColor.g}, ${noiseColor.b}, ${adjustedOpacity})`;
+        ctx.fillStyle = `rgba(${noiseColor.r}, ${noiseColor.g}, ${noiseColor.b}, ${adjustedOpacity * gradTranspMultiplierFactor})`;
 
         ctx.fillRect(x, y, 1, 1);
       }
     }
 
-  }, [textureWidth, textureHeight, noiseColor, totalOpacity, brightOpacity, darkOpacity, grayLevels, scaleMultiplier, opacityThresholdFactor, contrastFactor, scale, seed]);
+    function getTranspGradientMultiplierFactor(_x: number, _y: number): number{
+      let minAlphaValue: number = 1.0;
+
+      if(transpGradients.tb !== 0.0){
+        const gradTranspThreshold: number = transpGradients.tb;
+        const tbValue = Math.min(_y / (textureWidth * gradTranspThreshold), 1.0);
+        minAlphaValue = Math.min(minAlphaValue, tbValue);
+      }
+      if(transpGradients.bt !== 0.0){
+        const gradTranspThreshold: number = transpGradients.bt;
+        const tbValue = Math.min((textureHeight - _y)/(textureWidth * gradTranspThreshold), 1.0);
+        minAlphaValue = Math.min(minAlphaValue, tbValue);
+      }
+      if(transpGradients.rl !== 0.0){
+        const gradTranspThreshold: number = transpGradients.rl;
+        const tbValue = Math.min(_x / (textureWidth * gradTranspThreshold), 1.0);
+        minAlphaValue = Math.min(minAlphaValue, tbValue);
+      }
+      if(transpGradients.lr !== 0.0){
+        const gradTranspThreshold: number = transpGradients.lr;
+        const tbValue = Math.min((textureWidth - _x)/(textureWidth * gradTranspThreshold), 1.0);
+        minAlphaValue = Math.min(minAlphaValue, tbValue);
+      }
+
+      return minAlphaValue;
+    }
+
+  }, [textureWidth, textureHeight, noiseColor, totalOpacity, brightOpacity, darkOpacity, grayLevels, scaleMultiplier, opacityThresholdFactor, contrastFactor, scale, seed, transpGradients]);
 
 
   // exportacao do noise
@@ -188,14 +218,17 @@ export default function NoiseCanvas():React.ReactElement{
   }
 
 
+  
+
+
   return(
     <div className="noise-canvas-component">
       
       <div className="main-section">
-        <div className="h-full overflow-y-scroll flex flex-col gap-3">
+        <div className="h-full overflow-y-scroll flex flex-col gap-5">
         
           <section className="settings-section">
-            <h2>Width</h2>
+            <h2>Size</h2>
         
             <div className="settings-section__container-controls">
               <div className="setting-control-container" id="texture-width">
@@ -213,6 +246,7 @@ export default function NoiseCanvas():React.ReactElement{
               </div>
             </div>
           </section>
+
           <section className="settings-section">
             <h2>Color</h2>
             <div className="settings-section__container-controls">
@@ -227,6 +261,7 @@ export default function NoiseCanvas():React.ReactElement{
                 </div>
                 {canShowColorPicker && <RgbColorPicker color={noiseColor} onChange={(newColor:RgbColor)=>{setNoiseColor(newColor)}} className="self-end pt-1" />}
               </div>
+
               <div className="setting-control-container" id="total-opacity">
                 <div className="setting-label-container">
                   <p>Total Opacity:</p>
@@ -234,6 +269,7 @@ export default function NoiseCanvas():React.ReactElement{
                 </div>
                 <input type="range" min={0} max={100} step={1} value={totalOpacity} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setTotalOpacity(Number(e.target.value))}} />
               </div>
+
               <div className="setting-control-container" id="noise-threshold">
                 <div className="setting-label-container">
                   <p>Opacity Threshold:</p>
@@ -241,6 +277,7 @@ export default function NoiseCanvas():React.ReactElement{
                 </div>
                 <input type="range" min={1.0} max={10.0} step={0.1} value={opacityThresholdFactor} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOpacityThresholdFactor(Number(e.target.value))}} />
               </div>
+
               <div className="setting-control-container" id="contrast-factor">
                 <div className="setting-label-container">
                   <p>Contrast Factor:</p>
@@ -261,6 +298,7 @@ export default function NoiseCanvas():React.ReactElement{
                   <IoDice className="svg-button" onClick={()=>{setSeed(Math.floor(Math.random()*5000))}} />
                 </div>
               </div>
+
               <div className="setting-control-container" id="gray-levels">
                 <div className="setting-label-container">
                   <p>Gray Levels:</p>
@@ -268,6 +306,7 @@ export default function NoiseCanvas():React.ReactElement{
                 </div>
                 <input type="range" min={2} max={24} step={1} value={grayLevels} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setGrayLevels(Number(e.target.value))}} />
               </div>
+
               <div className="setting-control-container" id="scale-multiplier">
                 <div className="setting-label-container">
                   <p>Scale Multiplier:</p>
@@ -275,6 +314,7 @@ export default function NoiseCanvas():React.ReactElement{
                 </div>
                 <input type="range" min={0.01} max={0.15} step={0.005} value={scaleMultiplier} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScaleMultiplier(Number(e.target.value))}} />
               </div>
+
               <div className="setting-control-container" id="scale-x">
                 <div className="setting-label-container">
                   <p>Noise X Scale::</p>
@@ -282,6 +322,7 @@ export default function NoiseCanvas():React.ReactElement{
                 </div>
                 <input type="range" min={0.2} max={10} step={0.2} value={scale[0]} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setScale([Number(e.target.value), scale[1]])}} />
               </div>
+
               <div className="setting-control-container" id="scale-y">
                 <div className="setting-label-container">
                   <p>Noise Y Scale::</p>
@@ -291,6 +332,8 @@ export default function NoiseCanvas():React.ReactElement{
               </div>
             </div>
           </section>
+
+          <TransparencyGradientSettings transpGradients={transpGradients} setTranspGradients={setTranspGradients} />
         </div>
       </div>
 

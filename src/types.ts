@@ -11,3 +11,10 @@ export type OverlayTextureType = {
     height: number,
     opacity: number,
 }
+
+export type TranspGradientType = {
+    tb: number,
+    bt: number,
+    rl: number,
+    lr: number
+}
