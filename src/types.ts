@@ -16,5 +16,6 @@ export type TranspGradientType = {
     tb: number,
     bt: number,
     rl: number,
-    lr: number
+    lr: number,
+    rad: number,
 }

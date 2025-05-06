@@ -30,7 +30,7 @@ export default function NoiseCanvas():React.ReactElement{
   const [opacityThresholdFactor, setOpacityThresholdFactor] = React.useState<number>(1.0);
   const [scale, setScale] = React.useState<[number, number]>([1.0, 1.0]);
   const [seed, setSeed] = React.useState<number>(1);
-  const [transpGradients, setTranspGradients] = React.useState<TranspGradientType>({tb: 0.0, bt: 0.0, rl: 0.0, lr: 0.0})
+  const [transpGradients, setTranspGradients] = React.useState<TranspGradientType>({tb: 0.0, bt: 0.0, rl: 0.0, lr: 0.0, rad: 0.0})
   
   const noiseGen:NoiseFunction2D = React.useMemo( ()=>{return createNoise2D(alea(seed))}, [seed] )
   const [canShowColorPicker, setCanShowColorPicker] = React.useState<boolean>(false)
@@ -64,7 +64,9 @@ export default function NoiseCanvas():React.ReactElement{
         // aplicacao do efeito de transparencia do gradiente
         let gradTranspMultiplierFactor: number = getTranspGradientMultiplierFactor(x, y)
 
-        const contrastedNoiseValue = 0.5 + (noiseValue - 0.5) * contrastFactor;
+        let contrastedNoiseValue = 0.5 + (noiseValue - 0.5) * contrastFactor;
+        contrastedNoiseValue = Math.max(0, Math.min(1, contrastedNoiseValue)); // clamp entre 0 e 1
+
         const adjustedOpacity = Math.pow(1 - contrastedNoiseValue, opacityThresholdFactor);
         ctx.fillStyle = `rgba(${noiseColor.r}, ${noiseColor.g}, ${noiseColor.b}, ${adjustedOpacity * gradTranspMultiplierFactor})`;
 
@@ -94,6 +96,25 @@ export default function NoiseCanvas():React.ReactElement{
         const gradTranspThreshold: number = transpGradients.lr;
         const tbValue = Math.min((textureWidth - _x)/(textureWidth * gradTranspThreshold), 1.0);
         minAlphaValue = Math.min(minAlphaValue, tbValue);
+      }
+      if(transpGradients.rad !== 0.0){
+        const centerX = textureWidth / 2;
+        const centerY = textureHeight / 2;
+        const dx = _x - centerX;
+        const dy = _y - centerY;
+        const pixelDistanceToCenter = Math.sqrt(dx * dx + dy * dy);
+        const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
+
+        const intensity = transpGradients.rad;
+
+        // Calcula alpha base do gradiente radial invertido
+        const normalized = Math.min(pixelDistanceToCenter / maxDistance, 1.0);
+        const radial = 1.0 - normalized;
+
+        // Interpola entre imagem original (alpha 1.0) e gradiente radial
+        const radialAlpha = (1.0 - intensity) * 1.0 + intensity * radial;
+
+        minAlphaValue = Math.min(minAlphaValue, radialAlpha);
       }
 
       return minAlphaValue;
