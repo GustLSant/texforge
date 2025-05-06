@@ -105,7 +105,7 @@ export default function OverlayTextureComponent(props:OverlayTextureProps){
 
             {
                 isPopUpOpen &&
-                <div ref={popUpRef} className="fixed bg-neutral-700 p-2 rounded-sm shadow-01" style={{top: popUpPosition.y, left: popUpPosition.x, zoom: 1.0/props.zoom}}>
+                <div ref={popUpRef} className="fixed bg-neutral-700 p-2 rounded-sm shadow-01 z-20" style={{top: popUpPosition.y, left: popUpPosition.x, zoom: 1.0/props.zoom}}>
                     <div className="flex gap-2 flex-col">
                         <div>
                             <p>Opacity: </p>
