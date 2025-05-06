@@ -1,6 +1,7 @@
 import React, { ReactElement, useContext, useRef } from "react";
 import { OverlayTexturesContext, OverlayTexturesContextType } from "../contexts/OverlayTexturesContext";
 import OverlayTextureComponent from "./OverlayTextureComponent";
+import * as htmlToImage from 'html-to-image';
 import "./TextureCanvas.css"
 
 
@@ -12,6 +13,7 @@ export default function TextureCanvas():ReactElement{
     const [imageSize, setImageSize] = React.useState<[number, number]>([0, 0]);
     const [imageZoom, setImageZoom] = React.useState<number>(1.0);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const exportRef = useRef<HTMLDivElement>(null);
 
 
     function handleChangeFileInput(event: React.ChangeEvent<HTMLInputElement>):void{
@@ -36,6 +38,38 @@ export default function TextureCanvas():ReactElement{
     }
 
 
+    function exportTexture(): void{
+        if(!exportRef.current || !imageSize[0] || !imageSize[1]){ return; }
+
+        htmlToImage
+        .toPng(exportRef.current, {
+            width: imageSize[0],
+            height: imageSize[1],
+            backgroundColor: 'transparent',
+            style: {
+                padding: '0px',
+                margin: '0px',
+                overflow: 'hidden',
+                transform: 'scale(1)',
+                zoom: '1',
+                backgroundColor: 'transparent',
+                borderRadius: '0px',
+                boxShadow: 'none'
+            },
+            pixelRatio: 1,
+        })
+        .then((dataUrl) => {
+            const link = document.createElement('a');
+            link.download = 'exported-texture.png';
+            link.href = dataUrl;
+            link.click();
+        })
+        .catch((error) => {
+            console.error('Error on exporting imagem:', error);
+        });
+    }
+
+
     return(
         <div className="texture-canvas main-section">
             <div className="flex flex-row justify-between items-center gap-2">
@@ -56,7 +90,7 @@ export default function TextureCanvas():ReactElement{
                 </div>
             </div>
 
-            <div className="bg-neutral-900 rounded-md p-1 overflow-auto relative" style={{height: '100%', zoom: `${imageZoom}`, boxShadow: '2px 2px 4px 4px rgba(0,0,0, 0.25) inset'}}>
+            <div ref={exportRef} className="bg-neutral-900 rounded-md p-1 overflow-auto relative" style={{height: '100%', zoom: `${imageZoom}`, boxShadow: '2px 2px 4px 4px rgba(0,0,0, 0.25) inset'}}>
                 {
                     imageData &&
                     <img src={imageData} style={{width: `${imageSize[0]}px`, height: `${imageSize[1]}px`, maxWidth: 'none', maxHeight: 'none', imageRendering: "pixelated"}} alt="" />
@@ -72,6 +106,10 @@ export default function TextureCanvas():ReactElement{
                         )
                     })
                 }
+            </div>
+
+            <div className="flex justify-end items-center gap-2">
+                <button className="button-01" onClick={exportTexture}>Export Texture</button>
             </div>
         </div>
     )
