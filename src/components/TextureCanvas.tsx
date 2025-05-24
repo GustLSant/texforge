@@ -47,13 +47,13 @@ export default function TextureCanvas():ReactElement{
             height: imageSize[1],
             backgroundColor: 'transparent',
             style: {
-                padding: '0px',
-                margin: '0px',
+                padding: '0px !important',
+                margin: '0px !important',
                 overflow: 'hidden',
                 transform: 'scale(1)',
                 zoom: '1',
                 backgroundColor: 'transparent',
-                borderRadius: '0px',
+                borderRadius: '0px !important',
                 boxShadow: 'none'
             },
             pixelRatio: 1,
