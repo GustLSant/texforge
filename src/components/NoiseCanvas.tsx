@@ -13,13 +13,13 @@ import './NoiseCanvas.css'
 
 let flag_isExportingTexture:boolean = false;
 let flag_isAddingTextureToContext:boolean = false;
-let oldViewScale:number = 1.0;
+let oldZoom:number = 1.0;
 
 
 export default function NoiseCanvas():React.ReactElement{
   const [textureWidth, setTextureWidth] = React.useState<number>(64);
   const [textureHeight, setTextureHeight] = React.useState<number>(64);
-  const [viewScale, setViewScale] = React.useState<number>(1.0);
+  const [zoom, setZoom] = React.useState<number>(1.0);
   const [noiseColor, setNoiseColor] = React.useState<RgbColor>({r: 10, g: 5, b: 0});
   const [totalOpacity, setTotalOpacity] = React.useState<number>(100);
   const [brightOpacity, setBrightOpacity] = React.useState<number>(100);
@@ -133,7 +133,7 @@ export default function NoiseCanvas():React.ReactElement{
       addTextureToCanvas(true)
       flag_isAddingTextureToContext = false
     }
-  }, [viewScale])
+  }, [zoom])
 
 
   function handleClickResetButton(_element:string):void{
@@ -175,17 +175,17 @@ export default function NoiseCanvas():React.ReactElement{
 
 
   function handleClickExportButton():void{
-    if(viewScale !== 1.0){
+    if(zoom !== 1.0){
       flag_isExportingTexture = true;
-      oldViewScale = viewScale;
-      setViewScale(1.0);
+      oldZoom = zoom;
+      setZoom(1.0);
     }
     else{
       exportTexture();
     }
   }
 
-  function exportTexture(_hasChangedViewScale:boolean=false):void{
+  function exportTexture(_hasChangedZoom:boolean=false):void{
     if(!canvasRef.current) { console.error('Error: canvas is not valid.'); return; }
     
     htmlToImage
@@ -195,7 +195,7 @@ export default function NoiseCanvas():React.ReactElement{
       link.download = 'generated-texture.png';
       link.href = dataUrl;
       link.click();
-      if(_hasChangedViewScale){ setViewScale(oldViewScale); }
+      if(_hasChangedZoom){ setZoom(oldZoom); }
     })
     .catch((err) => {
       console.error('Error on exporting texture: ', err);
@@ -206,23 +206,23 @@ export default function NoiseCanvas():React.ReactElement{
 
 
   function handleClickAddToCanvasButton():void{
-    if(viewScale !== 1.0){
+    if(zoom !== 1.0){
       flag_isAddingTextureToContext = true;
-      oldViewScale = viewScale;
-      setViewScale(1.0);
+      oldZoom = zoom;
+      setZoom(1.0);
     }
     else{
       addTextureToCanvas();
     }
   }
 
-  function addTextureToCanvas(_hasChangedViewScale:boolean=false):void{
+  function addTextureToCanvas(_hasChangedZoom:boolean=false):void{
     if(!canvasRef.current) { console.error('Error: canvas is not valid.'); return; }
     
     htmlToImage.toPng(canvasRef.current)
     .then((dataUrl) => {
       overlayTexturesContext?.addTexture(dataUrl, textureWidth, textureHeight);
-      if(_hasChangedViewScale){ setViewScale(oldViewScale); }
+      if(_hasChangedZoom){ setZoom(oldZoom); }
     })
     .catch((err) => {
       console.error('Error generating texture for overlay texture: ', err);
@@ -261,9 +261,9 @@ export default function NoiseCanvas():React.ReactElement{
                 <div className="setting-label-container"><p>Texture Height:</p>  <p>{textureHeight}px</p></div>
                 <input type="range" min={2} max={128} step={2} value={textureHeight} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setTextureHeight(Number(e.target.value))}} />
               </div>
-              <div className="setting-control-container" id="view-scale">
-                <div className="setting-label-container"><p>View Scale:</p>  <p>{viewScale}x</p></div>
-                <input type="range" min={1} max={10} step={1} value={viewScale} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setViewScale(Number(e.target.value))}} />
+              <div className="setting-control-container" id="zoom">
+                <div className="setting-label-container"><p>Zoom:</p>  <p>{zoom}x</p></div>
+                <input type="range" min={1} max={10} step={1} value={zoom} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setZoom(Number(e.target.value))}} />
               </div>
             </div>
           </section>
@@ -368,7 +368,7 @@ export default function NoiseCanvas():React.ReactElement{
             <button onClick={handleClickExportButton} className="button-01 self-center">Export Texture</button>
           </div>
         </div>
-        <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, zoom: viewScale, imageRendering: "pixelated" }} />
+        <canvas ref={canvasRef} className="noise-canvas" style={{ opacity: `${totalOpacity}%`, zoom: zoom, imageRendering: "pixelated" }} />
       </div>
     </div>
 
